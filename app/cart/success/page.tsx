@@ -1,16 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/app/context/CartContext";
 
-export default function CartPaymentSuccessPage() {
+function CartPaymentSuccessContent() {
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
 
-  const sessionId = searchParams.get("session_id");
-  const checkoutId = searchParams.get("checkout_id");
+  const sessionId =
+    searchParams.get("session_id");
+
+  const checkoutId =
+    searchParams.get("checkout_id");
 
   const [status, setStatus] = useState<
     "loading" | "success" | "error"
@@ -78,7 +85,11 @@ export default function CartPaymentSuccessPage() {
     }
 
     void confirmPayment();
-  }, [sessionId, checkoutId, clearCart]);
+  }, [
+    sessionId,
+    checkoutId,
+    clearCart,
+  ]);
 
   return (
     <main className="min-h-screen bg-gray-100 p-6 md:p-10">
@@ -111,7 +122,8 @@ export default function CartPaymentSuccessPage() {
 
         {checkoutId && (
           <p className="mt-5 break-all text-xs text-gray-400">
-            Номер на поръчката: {checkoutId}
+            Номер на поръчката:{" "}
+            {checkoutId}
           </p>
         )}
 
@@ -142,5 +154,33 @@ export default function CartPaymentSuccessPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function LoadingPaymentPage() {
+  return (
+    <main className="min-h-screen bg-gray-100 p-6 md:p-10">
+      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 text-center shadow">
+        <div className="text-6xl">⏳</div>
+
+        <h1 className="mt-6 text-4xl font-bold">
+          Зареждане...
+        </h1>
+
+        <p className="mt-5 text-lg text-gray-600">
+          Проверяваме данните за плащането.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+export default function CartPaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={<LoadingPaymentPage />}
+    >
+      <CartPaymentSuccessContent />
+    </Suspense>
   );
 }
