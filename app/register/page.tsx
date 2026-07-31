@@ -76,7 +76,8 @@ export default function RegisterPage() {
           <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Имейл" className="w-full border rounded-lg p-3" />
           <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Парола" className="w-full border rounded-lg p-3" />
           <input value={pageName} onChange={(e) => setPageName(e.target.value)} placeholder="Името на вашата страница" className="w-full border rounded-lg p-3" />
-
+{/* Публичен адрес на магазина */}
+<p className="text-sm text-gray-500"></p>
          <p className="text-sm text-gray-500">
   Вашият URL ще бъде:<br />
   <strong>
