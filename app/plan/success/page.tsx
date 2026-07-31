@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {
+  Suspense,
+  useEffect,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 
 type ConfirmationStatus =
@@ -9,19 +13,25 @@ type ConfirmationStatus =
   | "success"
   | "error";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+  const sessionId =
+    searchParams.get("session_id");
 
   const [status, setStatus] =
-    useState<ConfirmationStatus>("loading");
+    useState<ConfirmationStatus>(
+      "loading"
+    );
 
-  const [message, setMessage] = useState(
-    "Потвърждаваме абонамента..."
-  );
+  const [message, setMessage] =
+    useState(
+      "Потвърждаваме абонамента..."
+    );
 
-  const [confirmedPlan, setConfirmedPlan] =
-    useState<string | null>(null);
+  const [
+    confirmedPlan,
+    setConfirmedPlan,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     async function confirmSubscription() {
@@ -39,7 +49,8 @@ export default function PaymentSuccessPage() {
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type":
+                "application/json",
             },
             body: JSON.stringify({
               sessionId,
@@ -47,7 +58,8 @@ export default function PaymentSuccessPage() {
           }
         );
 
-        const result = await response.json();
+        const result =
+          await response.json();
 
         if (!response.ok) {
           console.error(
@@ -63,8 +75,12 @@ export default function PaymentSuccessPage() {
           return;
         }
 
-        setConfirmedPlan(result.plan || null);
+        setConfirmedPlan(
+          result.plan || null
+        );
+
         setStatus("success");
+
         setMessage(
           "Premium абонаментът е активиран успешно."
         );
@@ -72,6 +88,7 @@ export default function PaymentSuccessPage() {
         console.error(error);
 
         setStatus("error");
+
         setMessage(
           "Грешка при свързване със сървъра."
         );
@@ -82,11 +99,17 @@ export default function PaymentSuccessPage() {
   }, [sessionId]);
 
   function getPlanName() {
-    if (confirmedPlan === "premium_monthly") {
+    if (
+      confirmedPlan ===
+      "premium_monthly"
+    ) {
       return "Premium месечен";
     }
 
-    if (confirmedPlan === "premium_yearly") {
+    if (
+      confirmedPlan ===
+      "premium_yearly"
+    ) {
       return "Premium годишен";
     }
 
@@ -124,13 +147,15 @@ export default function PaymentSuccessPage() {
 
         {status === "success" && (
           <p className="mt-3 font-semibold text-green-700">
-            Активен план: {getPlanName()}
+            Активен план:{" "}
+            {getPlanName()}
           </p>
         )}
 
         {sessionId && (
           <p className="mt-5 break-all text-xs text-gray-400">
-            Stripe сесия: {sessionId}
+            Stripe сесия:{" "}
+            {sessionId}
           </p>
         )}
 
@@ -162,5 +187,37 @@ export default function PaymentSuccessPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function LoadingPaymentPage() {
+  return (
+    <main className="min-h-screen bg-gray-100 p-6 md:p-10">
+      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 text-center shadow">
+        <div className="text-6xl">
+          ⏳
+        </div>
+
+        <h1 className="mt-6 text-4xl font-bold">
+          Зареждане...
+        </h1>
+
+        <p className="mt-5 text-lg text-gray-600">
+          Проверяваме абонамента.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <LoadingPaymentPage />
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
