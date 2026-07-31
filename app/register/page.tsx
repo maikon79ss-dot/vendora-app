@@ -77,11 +77,13 @@ export default function RegisterPage() {
           <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Парола" className="w-full border rounded-lg p-3" />
           <input value={pageName} onChange={(e) => setPageName(e.target.value)} placeholder="Името на вашата страница" className="w-full border rounded-lg p-3" />
 
-          <p className="text-sm text-gray-500">
-            Вашият URL ще бъде:<br />
-            <strong>localhost:3000/store/{slug || "your-page"}</strong>
-          </p>
-
+         <p className="text-sm text-gray-500">
+  Вашият URL ще бъде:<br />
+  <strong>
+    {(process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "")}
+    /store/{slug || "your-page"}
+  </strong>
+</p>
           <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
             Създай профил
           </button>
