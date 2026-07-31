@@ -18,7 +18,8 @@ function CartPaymentSuccessContent() {
 
   const checkoutId =
     searchParams.get("checkout_id");
-
+const storeSlug =
+  searchParams.get("store_slug");
   const [status, setStatus] = useState<
     "loading" | "success" | "error"
   >("loading");
@@ -135,13 +136,16 @@ function CartPaymentSuccessContent() {
 
         {status !== "loading" && (
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/"
-              className="rounded-xl bg-blue-600 px-7 py-4 font-semibold text-white"
-            >
-              Продължи пазаруването
-            </Link>
-
+           <Link
+  href={
+    storeSlug
+      ? `/store/${storeSlug}`
+      : "/"
+  }
+  className="rounded-xl bg-blue-600 px-7 py-4 font-semibold text-white"
+>
+  Продължи пазаруването
+</Link>
             {status === "error" && (
               <Link
                 href="/cart"

@@ -133,15 +133,16 @@ export async function POST(
       error: sellerError,
     } = await supabaseAdmin
       .from("profiles")
-      .select(
-        `
-        id,
-        stripe_account_id,
-        stripe_enabled,
-        stripe_charges_enabled,
-        stripe_details_submitted
-        `
-      )
+    .select(
+  `
+  id,
+  store_slug,
+  stripe_account_id,
+  stripe_enabled,
+  stripe_charges_enabled,
+  stripe_details_submitted
+  `
+)
       .eq("id", ownerId)
       .single();
 
@@ -162,7 +163,17 @@ export async function POST(
         { status: 404 }
       );
     }
+const storeSlug = seller.store_slug;
 
+if (!storeSlug) {
+  return NextResponse.json(
+    {
+      error:
+        "Магазинът на продавача няма валиден адрес.",
+    },
+    { status: 400 }
+  );
+}
     if (
       !seller.stripe_account_id
     ) {
@@ -316,11 +327,12 @@ export async function POST(
             },
           },
 
-          success_url:
-            `${siteUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}&checkout_id=${encodeURIComponent(
-              checkoutId
-            )}`,
-
+         success_url:
+  `${siteUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}&checkout_id=${encodeURIComponent(
+    checkoutId
+  )}&store_slug=${encodeURIComponent(
+    storeSlug
+  )}`,
           cancel_url:
             `${siteUrl}/cart?payment=cancelled`,
         },
