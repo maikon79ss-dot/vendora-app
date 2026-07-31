@@ -1,45 +1,76 @@
-import { NextRequest, NextResponse } from "next/server";
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  throw new Error("Липсва STRIPE_SECRET_KEY.");
-}
-
-if (!supabaseUrl || !supabaseSecretKey) {
-  throw new Error("Липсват сървърните настройки за Supabase.");
-}
-
-const stripe = new Stripe(stripeSecretKey);
-
-const supabaseAdmin = createClient(
-  supabaseUrl,
-  supabaseSecretKey,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-);
 
 type ConfirmPaymentBody = {
   sessionId?: string;
   checkoutId?: string;
 };
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest
+) {
   try {
-    const body = (await request.json()) as ConfirmPaymentBody;
+    const stripeSecretKey =
+      process.env.STRIPE_SECRET_KEY;
 
-    const sessionId = body.sessionId?.trim();
-    const checkoutId = body.checkoutId?.trim();
+    const supabaseUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const supabaseSecretKey =
+      process.env.SUPABASE_SECRET_KEY;
+
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Липсва STRIPE_SECRET_KEY.",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (
+      !supabaseUrl ||
+      !supabaseSecretKey
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Липсват сървърните настройки за Supabase.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(
+      stripeSecretKey
+    );
+
+    const supabaseAdmin = createClient(
+      supabaseUrl,
+      supabaseSecretKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
+    );
+
+    const body =
+      (await request.json()) as ConfirmPaymentBody;
+
+    const sessionId =
+      body.sessionId?.trim();
+
+    const checkoutId =
+      body.checkoutId?.trim();
 
     if (!sessionId || !checkoutId) {
       return NextResponse.json(
@@ -51,10 +82,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /*
-     * Намираме поръчката, за да разберем
-     * кой е продавачът.
-     */
     const {
       data: orderRows,
       error: orderError,
@@ -90,14 +117,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!orderRows || orderRows.length === 0) {
+    if (
+      !orderRows ||
+      orderRows.length === 0
+    ) {
       return NextResponse.json(
-        { error: "Поръчката не беше намерена." },
+        {
+          error:
+            "Поръчката не беше намерена.",
+        },
         { status: 404 }
       );
     }
 
-    const ownerId = orderRows[0].owner_id;
+    const ownerId =
+      orderRows[0].owner_id;
 
     if (!ownerId) {
       return NextResponse.json(
@@ -109,10 +143,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /*
-     * Намираме Stripe Connected Account
-     * на продавача.
-     */
     const {
       data: seller,
       error: sellerError,
@@ -140,10 +170,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /*
-     * Direct charge Checkout Session трябва
-     * да се прочете от Connected Account.
-     */
     const checkoutSession =
       await stripe.checkout.sessions.retrieve(
         sessionId,
@@ -154,17 +180,13 @@ export async function POST(request: NextRequest) {
         }
       );
 
-    /*
-     * Проверяваме, че Stripe сесията е точно
-     * за тази Vendora поръчка.
-     */
     if (
-      checkoutSession.metadata?.payment_type !==
-        "store_order" ||
-      checkoutSession.metadata?.checkout_id !==
-        checkoutId ||
-      checkoutSession.metadata?.seller_id !==
-        ownerId
+      checkoutSession.metadata
+        ?.payment_type !== "store_order" ||
+      checkoutSession.metadata
+        ?.checkout_id !== checkoutId ||
+      checkoutSession.metadata
+        ?.seller_id !== ownerId
     ) {
       return NextResponse.json(
         {
@@ -176,7 +198,8 @@ export async function POST(request: NextRequest) {
     }
 
     if (
-      checkoutSession.payment_status !== "paid"
+      checkoutSession.payment_status !==
+      "paid"
     ) {
       return NextResponse.json(
         {
@@ -189,13 +212,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const alreadyPaid = orderRows.every(
-      (order) => order.status === "Платена"
-    );
+    const alreadyPaid =
+      orderRows.every(
+        (order) =>
+          order.status === "Платена"
+      );
 
-    /*
-     * Обновяваме всички редове от същата поръчка.
-     */
     const { error: updateError } =
       await supabaseAdmin
         .from("orders")
@@ -203,7 +225,10 @@ export async function POST(request: NextRequest) {
           status: "Платена",
           payment_method: "Stripe",
         })
-        .eq("checkout_id", checkoutId);
+        .eq(
+          "checkout_id",
+          checkoutId
+        );
 
     if (updateError) {
       console.error(
@@ -220,45 +245,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    /*
-     * Изпращаме имейл само при първото
-     * успешно потвърждение.
-     */
     if (!alreadyPaid) {
-      const firstOrder = orderRows[0];
+      const firstOrder =
+        orderRows[0];
 
-      const products = orderRows
-        .map(
-          (order) =>
-            `${order.product_name} × ${order.quantity}`
-        )
-        .join("\n");
+      const products =
+        orderRows
+          .map(
+            (order) =>
+              `${order.product_name} × ${order.quantity}`
+          )
+          .join("\n");
 
-      const total = orderRows.reduce(
-        (sum, order) =>
-          sum +
-          Number(order.total_price || 0),
-        0
-      );
+      const total =
+        orderRows.reduce(
+          (sum, order) =>
+            sum +
+            Number(
+              order.total_price || 0
+            ),
+          0
+        );
 
       const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env
+          .NEXT_PUBLIC_SITE_URL ||
         "http://localhost:3000";
 
       try {
-        const emailResponse = await fetch(
-          `${siteUrl}/api/send-order-email`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body: JSON.stringify({
-              to: firstOrder.customer_email,
-              subject:
-                "Потвърждение за платена поръчка",
-              message: `Здравейте, ${firstOrder.customer_name}!
+        const emailResponse =
+          await fetch(
+            `${siteUrl}/api/send-order-email`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              body: JSON.stringify({
+                to: firstOrder
+                  .customer_email,
+
+                subject:
+                  "Потвърждение за платена поръчка",
+
+                message: `Здравейте, ${firstOrder.customer_name}!
 
 Вашето плащане беше потвърдено успешно.
 
@@ -274,9 +305,9 @@ ${products}
 
 Поздрави,
 Vendora`,
-            }),
-          }
-        );
+              }),
+            }
+          );
 
         if (!emailResponse.ok) {
           console.error(
@@ -312,6 +343,7 @@ Vendora`,
       {
         error:
           "Плащането не можа да бъде потвърдено.",
+
         details:
           process.env.NODE_ENV ===
           "development"
