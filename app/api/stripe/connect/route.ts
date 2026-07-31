@@ -1,69 +1,96 @@
-import { NextRequest, NextResponse } from "next/server";
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseSecretKey =
-  process.env.SUPABASE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  throw new Error(
-    "Липсва STRIPE_SECRET_KEY в .env.local"
-  );
-}
-
-if (
-  !supabaseUrl ||
-  !supabaseAnonKey ||
-  !supabaseSecretKey
+export async function POST(
+  request: NextRequest
 ) {
-  throw new Error(
-    "Липсват настройките за Supabase."
-  );
-}
-
-const stripe = new Stripe(stripeSecretKey);
-
-/*
- * Този клиент се използва само за проверка
- * на влезлия потребител.
- */
-const supabaseAuth = createClient(
-  supabaseUrl,
-  supabaseAnonKey,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-);
-
-/*
- * Този клиент се използва само на сървъра
- * за записване на Stripe данните.
- */
-const supabaseAdmin = createClient(
-  supabaseUrl,
-  supabaseSecretKey,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-);
-
-export async function POST(request: NextRequest) {
   try {
+    const stripeSecretKey =
+      process.env.STRIPE_SECRET_KEY;
+
+    const supabaseUrl =
+      process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    const supabaseAnonKey =
+      process.env
+        .NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    const supabaseSecretKey =
+      process.env.SUPABASE_SECRET_KEY;
+
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Липсва STRIPE_SECRET_KEY.",
+        },
+        { status: 500 }
+      );
+    }
+
+    if (
+      !supabaseUrl ||
+      !supabaseAnonKey ||
+      !supabaseSecretKey
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Липсват настройките за Supabase.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(
+      stripeSecretKey
+    );
+
+    /*
+     * Този клиент се използва само
+     * за проверка на влезлия потребител.
+     */
+    const supabaseAuth = createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
+    );
+
+    /*
+     * Този клиент се използва само
+     * на сървъра за записване
+     * на Stripe данните.
+     */
+    const supabaseAdmin = createClient(
+      supabaseUrl,
+      supabaseSecretKey,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      }
+    );
+
     const authorization =
-      request.headers.get("authorization");
+      request.headers.get(
+        "authorization"
+      );
 
     const accessToken =
-      authorization?.replace("Bearer ", "");
+      authorization?.replace(
+        "Bearer ",
+        ""
+      );
 
     if (!accessToken) {
       return NextResponse.json(
@@ -129,8 +156,9 @@ export async function POST(request: NextRequest) {
       profile.stripe_account_id;
 
     /*
-     * Създаваме нов Express акаунт само
-     * ако продавачът още няма acct_ номер.
+     * Създаваме нов Express акаунт
+     * само ако продавачът още няма
+     * Stripe acct_ номер.
      */
     if (!stripeAccountId) {
       const account =
@@ -201,7 +229,8 @@ export async function POST(request: NextRequest) {
     }
 
     const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
+      process.env
+        .NEXT_PUBLIC_SITE_URL ||
       "http://localhost:3000";
 
     const accountLink =
@@ -218,7 +247,8 @@ export async function POST(request: NextRequest) {
 
         collection_options: {
           fields: "eventually_due",
-          future_requirements: "include",
+          future_requirements:
+            "include",
         },
       });
 
