@@ -1,43 +1,38 @@
-import { NextRequest, NextResponse } from "next/server";
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const webhookSecret =
-  process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
+export async function POST(
+  request: NextRequest
+) {
+  const stripeSecretKey =
+    process.env.STRIPE_SECRET_KEY;
 
-const supabaseUrl =
-  process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const webhookSecret =
+    process.env
+      .STRIPE_CONNECT_WEBHOOK_SECRET;
 
-const supabaseSecretKey =
-  process.env.SUPABASE_SECRET_KEY;
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-if (!stripeSecretKey) {
-  throw new Error("Липсва STRIPE_SECRET_KEY.");
-}
+  const supabaseSecretKey =
+    process.env.SUPABASE_SECRET_KEY;
 
-if (!supabaseUrl || !supabaseSecretKey) {
-  throw new Error(
-    "Липсват сървърните настройки за Supabase."
-  );
-}
-
-const stripe = new Stripe(stripeSecretKey);
-
-const supabaseAdmin = createClient(
-  supabaseUrl,
-  supabaseSecretKey,
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
+  if (!stripeSecretKey) {
+    return NextResponse.json(
+      {
+        error:
+          "Липсва STRIPE_SECRET_KEY.",
+      },
+      { status: 500 }
+    );
   }
-);
 
-export async function POST(request: NextRequest) {
   if (!webhookSecret) {
     return NextResponse.json(
       {
@@ -48,26 +43,61 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (
+    !supabaseUrl ||
+    !supabaseSecretKey
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Липсват сървърните настройки за Supabase.",
+      },
+      { status: 500 }
+    );
+  }
+
+  const stripe = new Stripe(
+    stripeSecretKey
+  );
+
+  const supabaseAdmin = createClient(
+    supabaseUrl,
+    supabaseSecretKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
+
   const signature =
-    request.headers.get("stripe-signature");
+    request.headers.get(
+      "stripe-signature"
+    );
 
   if (!signature) {
     return NextResponse.json(
-      { error: "Липсва Stripe подпис." },
+      {
+        error:
+          "Липсва Stripe подпис.",
+      },
       { status: 400 }
     );
   }
 
-  const rawBody = await request.text();
+  const rawBody =
+    await request.text();
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      signature,
-      webhookSecret
-    );
+    event =
+      stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        webhookSecret
+      );
   } catch (error) {
     console.error(
       "Connect webhook signature error:",
@@ -75,19 +105,24 @@ export async function POST(request: NextRequest) {
     );
 
     return NextResponse.json(
-      { error: "Невалиден Connect webhook подпис." },
+      {
+        error:
+          "Невалиден Connect webhook подпис.",
+      },
       { status: 400 }
     );
   }
 
   try {
     if (
-      event.type === "checkout.session.completed" ||
+      event.type ===
+        "checkout.session.completed" ||
       event.type ===
         "checkout.session.async_payment_succeeded"
     ) {
       const session =
-        event.data.object as Stripe.Checkout.Session;
+        event.data
+          .object as Stripe.Checkout.Session;
 
       if (
         session.metadata?.payment_type !==
@@ -103,16 +138,14 @@ export async function POST(request: NextRequest) {
 
       if (!checkoutId) {
         return NextResponse.json(
-          { error: "Липсва checkout_id." },
+          {
+            error:
+              "Липсва checkout_id.",
+          },
           { status: 400 }
         );
       }
 
-      /*
-       * Обновяваме само неплатени поръчки.
-       * Ако Stripe повтори събитието, няма да
-       * изпращаме втори имейл.
-       */
       const {
         data: updatedOrders,
         error: updateError,
@@ -122,8 +155,14 @@ export async function POST(request: NextRequest) {
           status: "Платена",
           payment_method: "Stripe",
         })
-        .eq("checkout_id", checkoutId)
-        .neq("status", "Платена")
+        .eq(
+          "checkout_id",
+          checkoutId
+        )
+        .neq(
+          "status",
+          "Платена"
+        )
         .select(
           `
           customer_name,
@@ -149,31 +188,35 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      /*
-       * Ако няма обновени редове, събитието вече
-       * е обработено и не пращаме имейл повторно.
-       */
       if (
         updatedOrders &&
         updatedOrders.length > 0
       ) {
-        const firstOrder = updatedOrders[0];
+        const firstOrder =
+          updatedOrders[0];
 
-        const total = updatedOrders.reduce(
-          (sum, order) =>
-            sum + Number(order.total_price || 0),
-          0
-        );
+        const total =
+          updatedOrders.reduce(
+            (sum, order) =>
+              sum +
+              Number(
+                order.total_price ||
+                  0
+              ),
+            0
+          );
 
-        const products = updatedOrders
-          .map(
-            (order) =>
-              `${order.product_name} × ${order.quantity}`
-          )
-          .join("\n");
+        const products =
+          updatedOrders
+            .map(
+              (order) =>
+                `${order.product_name} × ${order.quantity}`
+            )
+            .join("\n");
 
         const siteUrl =
-          process.env.NEXT_PUBLIC_SITE_URL ||
+          process.env
+            .NEXT_PUBLIC_SITE_URL ||
           "http://localhost:3000";
 
         try {
@@ -182,12 +225,17 @@ export async function POST(request: NextRequest) {
             {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
+                "Content-Type":
+                  "application/json",
               },
               body: JSON.stringify({
-                to: firstOrder.customer_email,
+                to:
+                  firstOrder
+                    .customer_email,
+
                 subject:
                   "Потвърждение за платена поръчка",
+
                 message: `Здравейте, ${firstOrder.customer_name}!
 
 Вашето плащане беше успешно.
@@ -208,10 +256,6 @@ Vendora`,
             }
           );
         } catch (emailError) {
-          /*
-           * Не връщаме Stripe грешка, защото
-           * плащането и поръчката са обработени.
-           */
           console.error(
             "Paid order email error:",
             emailError
@@ -229,18 +273,24 @@ Vendora`,
       "checkout.session.async_payment_failed"
     ) {
       const session =
-        event.data.object as Stripe.Checkout.Session;
+        event.data
+          .object as Stripe.Checkout.Session;
 
       const checkoutId =
-        session.metadata?.checkout_id;
+        session.metadata
+          ?.checkout_id;
 
       if (checkoutId) {
         await supabaseAdmin
           .from("orders")
           .update({
-            status: "Неуспешно плащане",
+            status:
+              "Неуспешно плащане",
           })
-          .eq("checkout_id", checkoutId);
+          .eq(
+            "checkout_id",
+            checkoutId
+          );
       }
     }
 
