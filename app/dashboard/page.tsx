@@ -36,7 +36,7 @@ export default function DashboardPage() {
   { date: string; revenue: number }[]
 >([]);
   const [loading, setLoading] = useState(true);
-
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   useEffect(() => {
     loadDashboard();
   }, []);
@@ -180,11 +180,47 @@ if (recentOrdersError) {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <div className="flex min-h-screen flex-col lg:flex-row">
-        <aside className="w-full border-b border-gray-200 bg-white p-4 lg:w-64 lg:border-b-0 lg:border-r lg:p-6">
+      <div className="relative min-h-screen lg:flex">
+        <div className="flex items-center justify-between border-b bg-white p-4 lg:hidden">
+ <h1 className="mb-8 hidden text-2xl font-bold lg:block">
+  Вендора
+</h1>
+
+  <button
+    type="button"
+    onClick={() =>
+      setMobileMenuOpen(true)
+    }
+    className="rounded-lg border px-4 py-2 text-2xl"
+    aria-label="Отвори менюто"
+  >
+    ☰
+  </button>
+</div>
+        <aside
+  className={`fixed inset-y-0 left-0 z-50 w-72 overflow-y-auto border-r border-gray-200 bg-white p-6 shadow-xl transition-transform duration-300 lg:static lg:z-auto lg:w-64 lg:translate-x-0 lg:shadow-none ${
+    mobileMenuOpen
+      ? "translate-x-0"
+      : "-translate-x-full"
+  }`}
+>
+  <div className="mb-6 flex items-center justify-between lg:hidden">
+  <span className="text-2xl font-bold">
+    Вендора
+  </span>
+
+  <button
+    type="button"
+    onClick={() => setMobileMenuOpen(false)}
+    className="rounded-lg border px-3 py-2 text-xl"
+    aria-label="Затвори менюто"
+  >
+    ✕
+  </button>
+</div>
           <h1 className="mb-8 text-2xl font-bold">Вендора</h1>
 
-          <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:block lg:space-y-4">
+          <nav className="space-y-4">
             <p>
               <Link href="/dashboard">🏠 Dashboard</Link>
             </p>
@@ -231,8 +267,15 @@ if (recentOrdersError) {
 </Button>
           </nav>
         </aside>
-
-        <section className="min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
+{mobileMenuOpen && (
+  <button
+    type="button"
+    aria-label="Затвори менюто"
+    onClick={() => setMobileMenuOpen(false)}
+    className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+  />
+)}
+        <section className="w-full min-w-0 p-4 sm:p-6 lg:flex-1 lg:p-10">
           <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">
             Здравей, {profile.first_name}!
           </h2>
