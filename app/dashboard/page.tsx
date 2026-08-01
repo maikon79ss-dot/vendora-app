@@ -180,11 +180,11 @@ if (recentOrdersError) {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      <div className="flex min-h-screen">
-        <aside className="w-64 border-r border-gray-200 bg-white p-6">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        <aside className="w-full border-b border-gray-200 bg-white p-4 lg:w-64 lg:border-b-0 lg:border-r lg:p-6">
           <h1 className="mb-8 text-2xl font-bold">Вендора</h1>
 
-          <nav className="space-y-4">
+          <nav className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:block lg:space-y-4">
             <p>
               <Link href="/dashboard">🏠 Dashboard</Link>
             </p>
@@ -232,7 +232,7 @@ if (recentOrdersError) {
           </nav>
         </aside>
 
-        <section className="flex-1 p-10">
+        <section className="min-w-0 flex-1 p-4 sm:p-6 lg:p-10">
           <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">
             Здравей, {profile.first_name}!
           </h2>
