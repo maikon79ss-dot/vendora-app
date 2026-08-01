@@ -181,16 +181,14 @@ if (recentOrdersError) {
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="relative min-h-screen lg:flex">
-        <div className="flex items-center justify-between border-b bg-white p-4 lg:hidden">
- <h1 className="mb-8 hidden text-2xl font-bold lg:block">
-  Вендора
-</h1>
+   <div className="flex items-center justify-between border-b bg-white p-4 lg:hidden">
+  <h1 className="text-2xl font-bold">
+    Вендора
+  </h1>
 
   <button
     type="button"
-    onClick={() =>
-      setMobileMenuOpen(true)
-    }
+    onClick={() => setMobileMenuOpen(true)}
     className="rounded-lg border px-4 py-2 text-2xl"
     aria-label="Отвори менюто"
   >
@@ -218,7 +216,9 @@ if (recentOrdersError) {
     ✕
   </button>
 </div>
-          <h1 className="mb-8 text-2xl font-bold">Вендора</h1>
+          <h1 className="mb-8 hidden text-2xl font-bold lg:block">
+  Вендора
+</h1>
 
           <nav className="space-y-4">
             <p>
