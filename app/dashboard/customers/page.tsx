@@ -104,7 +104,7 @@ const [orders, setOrders] = useState<any[]>([]);
   });
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
+    <main className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-10">
       <h1 className="mb-8 text-4xl font-bold">Клиенти</h1>
 
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -143,144 +143,171 @@ const [orders, setOrders] = useState<any[]>([]);
         />
       </div>
 
-      <div className="rounded-xl bg-white p-6 shadow">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="py-3 text-left">Име</th>
-              <th className="py-3 text-left">Email</th>
-              <th className="py-3 text-left">Телефон</th>
-              <th className="py-3 text-center">Поръчки</th>
-<th className="py-3 text-right">Общо</th>
-            </tr>
- 
-          </thead>
-  
- <tbody>
-  {filteredCustomers.map((customer) => {
-const customerOrders = orders.filter(
-  (order) =>
-    order.customer_email?.trim().toLowerCase() ===
-    customer.customer_email
-);
-const groupedOrders = Object.values(
-  customerOrders.reduce((acc: any, order: any) => {
-    const key = order.checkout_id || order.id;
+  <div className="rounded-xl bg-white p-4 shadow sm:p-6">
+  <div className="w-full overflow-x-auto">
+    <table className="min-w-[760px] w-full">
+      <thead>
+        <tr className="border-b">
+          <th className="whitespace-nowrap px-3 py-3 text-left">
+            Име
+          </th>
 
-    if (!acc[key]) {
-      acc[key] = {
-        ...order,
-        products: [],
-      };
-    }
+          <th className="whitespace-nowrap px-3 py-3 text-left">
+            Email
+          </th>
 
-    acc[key].products.push({
-      name: order.product_name,
-      quantity: order.quantity,
-    });
+          <th className="whitespace-nowrap px-3 py-3 text-left">
+            Телефон
+          </th>
 
-    return acc;
-  }, {})
-);
+          <th className="whitespace-nowrap px-3 py-3 text-center">
+            Поръчки
+          </th>
 
-    return (
-  <React.Fragment key={customer.customer_email}>
-        <tr
-          
-          className="border-b hover:bg-gray-50 cursor-pointer"
-          onClick={() =>
-            setSelectedCustomer(
-              selectedCustomer === customer.customer_email
-                ? null
-                : customer.customer_email
-            )
-          }
-        >
-          <td className="py-3">{customer.customer_name}</td>
-
-          <td>{customer.customer_email}</td>
-
-          <td>{customer.customer_phone}</td>
-
-          <td className="text-center">{customer.order_count}</td>
-
-          <td className="text-right">
-            {(customer.total_spent ?? 0).toFixed(2)} €
-          </td>
+          <th className="whitespace-nowrap px-3 py-3 text-right">
+            Общо
+          </th>
         </tr>
+      </thead>
 
-        {selectedCustomer === customer.customer_email && (
-          <tr key={`${customer.customer_email}-orders`}>
-            <td colSpan={5} className="bg-gray-50 p-4">
-              <div className="space-y-3">
-                {customerOrders.length === 0 ? (
-                  <p className="text-gray-500">
-                    Няма намерени поръчки.
-                  </p>
-                ) : (
-                  groupedOrders.map((order: any) => (
-                    <div
-                      key={order.id}
-                      className="rounded-lg border bg-white p-4"
-                    >
-                      <div className="flex justify-between">
-                        <span>
-                          <strong>Дата:</strong>{" "}
-                          {new Date(
-                            order.created_at
-                          ).toLocaleDateString()}
-                        </span>
+      <tbody>
+        {filteredCustomers.map((customer) => {
+          const customerOrders = orders.filter(
+            (order) =>
+              order.customer_email?.trim().toLowerCase() ===
+              customer.customer_email
+          );
 
-                        <span className="font-semibold">
-                          {order.status}
-                        </span>
-                      </div>
+          const groupedOrders = Object.values(
+            customerOrders.reduce((acc: any, order: any) => {
+              const key = order.checkout_id || order.id;
 
-                      <div className="mt-3">
-  <strong>Продукти:</strong>
+              if (!acc[key]) {
+                acc[key] = {
+                  ...order,
+                  products: [],
+                };
+              }
 
-  <ul className="mt-2 list-disc pl-5">
-    {order.products.map((product: any, index: number) => (
-      <li key={index}>
-        {product.name} × {product.quantity}
-      </li>
-    ))}
-  </ul>
-</div>
+              acc[key].products.push({
+                name: order.product_name,
+                quantity: order.quantity,
+              });
 
-                      <div>
-                        <strong>Общо:</strong>{" "}
-                        {Number(order.total_price).toFixed(2)} €
-                        <div className="mt-2">
-  <strong>Куриер:</strong>{" "}
-  {order.courier || "Не е избран"}
-</div>
+              return acc;
+            }, {})
+          );
 
-<div>
-  <strong>Адрес:</strong>{" "}
-  {order.address}, {order.city}, {order.postal_code}
-</div>
+          return (
+            <React.Fragment key={customer.customer_email}>
+              <tr
+                className="cursor-pointer border-b hover:bg-gray-50"
+                onClick={() =>
+                  setSelectedCustomer(
+                    selectedCustomer === customer.customer_email
+                      ? null
+                      : customer.customer_email
+                  )
+                }
+              >
+                <td className="whitespace-nowrap px-3 py-3 font-medium">
+                  {customer.customer_name}
+                </td>
 
-{order.tracking_number && (
-  <div>
-    <strong>Проследяване:</strong>{" "}
-    {order.tracking_number}
-  </div>
-)}
-                      </div>
+                <td className="whitespace-nowrap px-3 py-3">
+                  {customer.customer_email}
+                </td>
+
+                <td className="whitespace-nowrap px-3 py-3">
+                  {customer.customer_phone}
+                </td>
+
+                <td className="whitespace-nowrap px-3 py-3 text-center">
+                  {customer.order_count}
+                </td>
+
+                <td className="whitespace-nowrap px-3 py-3 text-right">
+                  {(customer.total_spent ?? 0).toFixed(2)} €
+                </td>
+              </tr>
+
+              {selectedCustomer === customer.customer_email && (
+                <tr>
+                  <td colSpan={5} className="bg-gray-50 p-4">
+                    <div className="space-y-3">
+                      {customerOrders.length === 0 ? (
+                        <p className="text-gray-500">
+                          Няма намерени поръчки.
+                        </p>
+                      ) : (
+                        groupedOrders.map((order: any) => (
+                          <div
+                            key={order.id}
+                            className="rounded-lg border bg-white p-4"
+                          >
+                            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                              <span>
+                                <strong>Дата:</strong>{" "}
+                                {new Date(
+                                  order.created_at
+                                ).toLocaleDateString()}
+                              </span>
+
+                              <span className="font-semibold">
+                                {order.status}
+                              </span>
+                            </div>
+
+                            <div className="mt-3">
+                              <strong>Продукти:</strong>
+
+                              <ul className="mt-2 list-disc pl-5">
+                                {order.products.map(
+                                  (product: any, index: number) => (
+                                    <li key={index}>
+                                      {product.name} × {product.quantity}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+
+                            <div className="mt-3 break-words">
+                              <strong>Общо:</strong>{" "}
+                              {Number(order.total_price).toFixed(2)} €
+
+                              <div className="mt-2">
+                                <strong>Куриер:</strong>{" "}
+                                {order.courier || "Не е избран"}
+                              </div>
+
+                              <div>
+                                <strong>Адрес:</strong>{" "}
+                                {order.address}, {order.city},{" "}
+                                {order.postal_code}
+                              </div>
+
+                              {order.tracking_number && (
+                                <div>
+                                  <strong>Проследяване:</strong>{" "}
+                                  {order.tracking_number}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  ))
-                )}
-              </div>
-            </td>
-          </tr>
-        )}
-      </React.Fragment>
-    );
-  })}
-</tbody>
-        </table>
-      </div>
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+</div>
     </main>
   );
 }

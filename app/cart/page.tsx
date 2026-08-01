@@ -749,30 +749,32 @@ Vendora`
 <p className="text-4xl font-bold text-blue-600">
   {finalTotal.toFixed(2)} €
 </p>
-            </div>
-<div className="mt-8 rounded-2xl bg-white p-8 shadow">
-  <h2 className="text-2xl font-bold">
+<div className="mt-8 rounded-2xl bg-white p-5 shadow sm:p-8">
+  <h2 className="text-xl font-bold sm:text-2xl">
     🎟 Код за отстъпка
   </h2>
 
-  <div className="mt-5 flex gap-3">
+  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
     <input
       value={couponCode}
-      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+      onChange={(e) =>
+        setCouponCode(
+          e.target.value.toUpperCase()
+        )
+      }
       placeholder="Например: WELCOME10"
-      className="flex-1 rounded-lg border p-3"
+      className="min-w-0 w-full rounded-lg border p-3 sm:flex-1"
     />
 
     <button
       type="button"
       onClick={applyCoupon}
-      className="rounded-lg bg-blue-600 px-6 text-white"
-      
+      className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white sm:w-auto"
     >
       Приложи
     </button>
   </div>
-
+</div>
   {appliedCoupon && (
     <p className="mt-4 font-semibold text-green-600">
       ✔ Активен купон: {appliedCoupon}

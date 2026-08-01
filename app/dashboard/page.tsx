@@ -361,28 +361,47 @@ if (recentOrdersError) {
   </div>
 </div>
 
-<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-  <h2 className="mb-6 text-2xl font-bold">📈 Продажби</h2>
+<div className="mt-8 min-w-0 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+  <h2 className="mb-6 text-xl font-bold sm:text-2xl">
+    📈 Продажби
+  </h2>
 
-  <div style={{ width: "100%", height: 350 }}>
-    <ResponsiveContainer>
-      <LineChart data={salesData}>
-        <CartesianGrid strokeDasharray="3 3" />
+  <div className="w-full overflow-x-auto">
+    <div className="h-[300px] min-w-[560px] sm:h-[350px] sm:min-w-0">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={salesData}
+          margin={{
+            top: 10,
+            right: 20,
+            left: 0,
+            bottom: 10,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
 
-        <XAxis dataKey="date" />
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 12 }}
+            minTickGap={20}
+          />
 
-        <YAxis />
+          <YAxis
+            width={45}
+            tick={{ fontSize: 12 }}
+          />
 
-        <Tooltip />
+          <Tooltip />
 
-        <Line
-          type="monotone"
-          dataKey="revenue"
-          stroke="#2563eb"
-          strokeWidth={3}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+          <Line
+            type="monotone"
+            dataKey="revenue"
+            stroke="#2563eb"
+            strokeWidth={3}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   </div>
 </div>
          </section>
