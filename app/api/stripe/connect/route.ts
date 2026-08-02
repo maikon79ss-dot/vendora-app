@@ -267,17 +267,10 @@ export async function POST(
         : "Неизвестна Stripe грешка.";
 
     return NextResponse.json(
-      {
-        error:
-          "Неуспешно свързване със Stripe.",
-
-        details:
-          process.env.NODE_ENV ===
-          "development"
-            ? errorMessage
-            : undefined,
-      },
-      { status: 500 }
-    );
-  }
+  {
+    error: `Неуспешно свързване със Stripe: ${errorMessage}`,
+  },
+  { status: 500 }
+);
 }
+  }
