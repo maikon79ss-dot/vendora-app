@@ -39,7 +39,9 @@ export async function POST(request: Request) {
 
     const { data, error } =
       await resend.emails.send({
-        from: "Vendora <onboarding@resend.dev>",
+        from:
+  process.env.RESEND_FROM_EMAIL ||
+  "Vendora <onboarding@resend.dev>",
         to: [body.to],
         subject: body.subject,
         html: `
