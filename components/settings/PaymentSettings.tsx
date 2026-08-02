@@ -47,10 +47,14 @@ async function connectStripe() {
 
   const data = await response.json();
 
-  if (!response.ok) {
-    alert(data.error);
-    return;
-  }
+ if (!response.ok) {
+  alert(
+    data.details
+      ? `${data.error}\n\n${data.details}`
+      : data.error
+  );
+  return;
+}
 
   window.location.href = data.url;
 }
