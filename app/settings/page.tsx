@@ -644,7 +644,7 @@ console.log("PAYMENT SETTINGS BEFORE SAVE:", {
 
         default_payment_link:
           defaultPaymentLink,
-
+stripe_enabled: stripeEnabled,
 
 paypal_enabled: paypalEnabled,
 paypal_payment_link:
