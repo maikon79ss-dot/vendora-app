@@ -412,7 +412,7 @@ export default function PlanPage() {
                 >
                   {portalLoading
                     ? "Отваряне..."
-                    : "Отпиши се"}
+                   : "Управлявай абонамента" }
                 </button>
               </>
             ) : (
