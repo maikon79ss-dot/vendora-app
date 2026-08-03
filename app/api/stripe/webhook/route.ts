@@ -7,6 +7,68 @@ import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
 
+type VendoraPlan =
+  | "premium_monthly"
+  | "premium_yearly";
+
+function isVendoraPlan(
+  value: string | null | undefined
+): value is VendoraPlan {
+  return (
+    value === "premium_monthly" ||
+    value === "premium_yearly"
+  );
+}
+
+function getStripeId(
+  value:
+    | string
+    | { id: string }
+    | null
+    | undefined
+) {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return value?.id || null;
+}
+
+/*
+ * Stripe има различни версии на Invoice.
+ * Тази функция поддържа както старото поле
+ * invoice.subscription, така и новото
+ * parent.subscription_details.subscription.
+ */
+function getInvoiceSubscriptionId(
+  invoice: Stripe.Invoice
+): string | null {
+  const invoiceData =
+    invoice as Stripe.Invoice & {
+      subscription?:
+        | string
+        | Stripe.Subscription
+        | null;
+
+      parent?: {
+        subscription_details?: {
+          subscription?:
+            | string
+            | Stripe.Subscription
+            | null;
+        } | null;
+      } | null;
+    };
+
+  const subscription =
+    invoiceData.subscription ||
+    invoiceData.parent
+      ?.subscription_details
+      ?.subscription;
+
+  return getStripeId(subscription);
+}
+
 export async function POST(
   request: NextRequest
 ) {
@@ -112,70 +174,338 @@ export async function POST(
     );
   }
 
-  try {
-    if (
-      event.type ===
-      "checkout.session.completed"
-    ) {
-      const session =
-        event.data
-          .object as Stripe.Checkout.Session;
+  /*
+   * Намира Vendora профила чрез:
+   * 1. user_id от Stripe metadata;
+   * 2. stripe_subscription_id;
+   * 3. stripe_customer_id.
+   */
+  async function findUserId(params: {
+    metadataUserId?:
+      | string
+      | null;
 
-      const userId =
-        session.metadata?.user_id ||
-        session.client_reference_id;
+    subscriptionId?:
+      | string
+      | null;
 
-      const plan =
-        session.metadata?.plan;
+    customerId?:
+      | string
+      | null;
+  }): Promise<string | null> {
+    if (params.metadataUserId) {
+      return params.metadataUserId;
+    }
 
-      if (
-        !userId ||
-        (
-          plan !==
-            "premium_monthly" &&
-          plan !==
-            "premium_yearly"
+    if (params.subscriptionId) {
+      const {
+        data,
+        error,
+      } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq(
+          "stripe_subscription_id",
+          params.subscriptionId
         )
-      ) {
-        console.error(
-          "Липсват user_id или валиден plan в Stripe metadata."
-        );
+        .maybeSingle();
 
-        return NextResponse.json(
-          {
-            error:
-              "Липсват данни за потребителя или плана.",
-          },
-          { status: 400 }
+      if (error) {
+        console.error(
+          "Profile lookup by subscription error:",
+          error
         );
       }
 
-      const customerId =
-        typeof session.customer ===
-        "string"
-          ? session.customer
-          : session.customer?.id ||
-            null;
+      if (data?.id) {
+        return data.id;
+      }
+    }
 
-      const subscriptionId =
-        typeof session.subscription ===
-        "string"
-          ? session.subscription
-          : session.subscription?.id ||
-            null;
-
+    if (params.customerId) {
       const {
-        error: profileError,
+        data,
+        error,
       } = await supabaseAdmin
         .from("profiles")
-        .update({
-          plan: "premium",
+        .select("id")
+        .eq(
+          "stripe_customer_id",
+          params.customerId
+        )
+        .maybeSingle();
 
-          subscription_plan:
-            plan,
+      if (error) {
+        console.error(
+          "Profile lookup by customer error:",
+          error
+        );
+      }
 
+      if (data?.id) {
+        return data.id;
+      }
+    }
+
+    return null;
+  }
+
+  async function updateProfile(
+    userId: string,
+    values: Record<
+      string,
+      string | boolean | null
+    >
+  ) {
+    const { error } =
+      await supabaseAdmin
+        .from("profiles")
+        .update(values)
+        .eq("id", userId);
+
+    if (error) {
+      console.error(
+        "Profile update error:",
+        error
+      );
+
+      throw new Error(
+        "Неуспешно обновяване на профила."
+      );
+    }
+  }
+
+  try {
+    switch (event.type) {
+      /*
+       * Първа успешна покупка на
+       * месечен или годишен Premium.
+       */
+      case "checkout.session.completed": {
+        const session =
+          event.data
+            .object as Stripe.Checkout.Session;
+
+        const userId =
+          session.metadata?.user_id ||
+          session.client_reference_id;
+
+        const plan =
+          session.metadata?.plan;
+
+        if (
+          !userId ||
+          !isVendoraPlan(plan)
+        ) {
+          console.error(
+            "Липсват user_id или валиден plan в Checkout metadata."
+          );
+
+          return NextResponse.json(
+            {
+              error:
+                "Липсват данни за потребителя или плана.",
+            },
+            { status: 400 }
+          );
+        }
+
+        const customerId =
+          getStripeId(
+            session.customer
+          );
+
+        const subscriptionId =
+          getStripeId(
+            session.subscription
+          );
+
+        await updateProfile(
+          userId,
+          {
+            plan: "premium",
+
+            subscription_plan:
+              plan,
+
+            subscription_status:
+              "active",
+
+            stripe_customer_id:
+              customerId,
+
+            stripe_subscription_id:
+              subscriptionId,
+
+            cancel_at_period_end:
+              false,
+          }
+        );
+
+        /*
+         * Предпазване от дублиран
+         * запис при повторен webhook.
+         */
+        const {
+          data: existingPayment,
+          error:
+            existingPaymentError,
+        } = await supabaseAdmin
+          .from(
+            "subscription_payments"
+          )
+          .select("id")
+          .eq(
+            "stripe_checkout_session_id",
+            session.id
+          )
+          .maybeSingle();
+
+        if (existingPaymentError) {
+          console.error(
+            "Payment lookup error:",
+            existingPaymentError
+          );
+
+          throw new Error(
+            "Неуспешна проверка на плащането."
+          );
+        }
+
+        if (!existingPayment) {
+          const amount =
+            Number(
+              session.amount_total || 0
+            ) / 100;
+
+          const {
+            error: paymentError,
+          } = await supabaseAdmin
+            .from(
+              "subscription_payments"
+            )
+            .insert([
+              {
+                user_id:
+                  userId,
+
+                stripe_customer_id:
+                  customerId,
+
+                stripe_subscription_id:
+                  subscriptionId,
+
+                stripe_checkout_session_id:
+                  session.id,
+
+                plan,
+
+                amount,
+
+                currency:
+                  session.currency ||
+                  "eur",
+
+                status:
+                  session.payment_status ||
+                  "paid",
+
+                paid_at:
+                  new Date()
+                    .toISOString(),
+              },
+            ]);
+
+          if (paymentError) {
+            console.error(
+              "Payment record error:",
+              paymentError
+            );
+
+            throw new Error(
+              "Неуспешно записване на плащането."
+            );
+          }
+        }
+
+        console.log(
+          `Premium активиран за ${userId}: ${plan}`
+        );
+
+        break;
+      }
+
+      /*
+       * Изпълнява се при:
+       * - натискане на отказване;
+       * - включване на cancel_at_period_end;
+       * - промяна на статус;
+       * - подновяване или промяна на план.
+       */
+      case "customer.subscription.updated": {
+        const subscription =
+          event.data
+            .object as Stripe.Subscription;
+
+        const subscriptionId =
+          subscription.id;
+
+        const customerId =
+          getStripeId(
+            subscription.customer
+          );
+
+        const metadataUserId =
+          subscription.metadata
+            ?.user_id;
+
+        const metadataPlan =
+          subscription.metadata?.plan;
+
+        const userId =
+          await findUserId({
+            metadataUserId,
+            subscriptionId,
+            customerId,
+          });
+
+        if (!userId) {
+          console.error(
+            "Не е намерен профил за обновения абонамент:",
+            subscriptionId
+          );
+
+          break;
+        }
+
+        /*
+         * При cancel_at_period_end=true
+         * потребителят запазва Premium,
+         * докато Stripe действително изпрати
+         * customer.subscription.deleted.
+         */
+        const premiumIsActive =
+          subscription.status ===
+            "active" ||
+          subscription.status ===
+            "trialing" ||
+          subscription.status ===
+            "past_due";
+
+        const subscriptionEnded =
+          subscription.status ===
+            "canceled" ||
+          subscription.status ===
+            "unpaid" ||
+          subscription.status ===
+            "incomplete_expired";
+
+        const values: Record<
+          string,
+          string | boolean | null
+        > = {
           subscription_status:
-            "active",
+            subscription.status,
 
           stripe_customer_id:
             customerId,
@@ -184,122 +514,277 @@ export async function POST(
             subscriptionId,
 
           cancel_at_period_end:
-            false,
-        })
-        .eq("id", userId);
+            subscription
+              .cancel_at_period_end,
+        };
 
-      if (profileError) {
-        console.error(
-          "Profile update error:",
-          profileError
+        if (
+          isVendoraPlan(
+            metadataPlan
+          )
+        ) {
+          values.subscription_plan =
+            metadataPlan;
+        }
+
+        if (premiumIsActive) {
+          values.plan = "premium";
+        }
+
+        if (subscriptionEnded) {
+          values.plan = "free";
+          values.subscription_plan =
+            "free";
+        }
+
+        await updateProfile(
+          userId,
+          values
         );
 
-        return NextResponse.json(
-          {
-            error:
-              "Неуспешно активиране на Premium.",
-          },
-          { status: 500 }
+        console.log(
+          `Абонаментът е обновен за ${userId}: ${subscription.status}`
         );
+
+        break;
       }
 
       /*
-       * Проверяваме дали тази Stripe сесия
-       * вече е записана. Това предпазва от
-       * дублиран запис при повторен webhook.
+       * Изпраща се, когато абонаментът
+       * действително приключи.
        */
-      const {
-        data: existingPayment,
-        error:
-          existingPaymentError,
-      } = await supabaseAdmin
-        .from(
-          "subscription_payments"
-        )
-        .select("id")
-        .eq(
-          "stripe_checkout_session_id",
-          session.id
-        )
-        .maybeSingle();
+      case "customer.subscription.deleted": {
+        const subscription =
+          event.data
+            .object as Stripe.Subscription;
 
-      if (existingPaymentError) {
-        console.error(
-          "Payment lookup error:",
-          existingPaymentError
-        );
+        const customerId =
+          getStripeId(
+            subscription.customer
+          );
 
-        return NextResponse.json(
-          {
-            error:
-              "Неуспешна проверка на плащането.",
-          },
-          { status: 500 }
-        );
-      }
+        const userId =
+          await findUserId({
+            metadataUserId:
+              subscription.metadata
+                ?.user_id,
 
-      if (!existingPayment) {
-        const amount =
-          Number(
-            session.amount_total || 0
-          ) / 100;
+            subscriptionId:
+              subscription.id,
 
-        const {
-          error: paymentError,
-        } = await supabaseAdmin
-          .from(
-            "subscription_payments"
-          )
-          .insert([
-            {
-              user_id:
-                userId,
+            customerId,
+          });
 
-              stripe_customer_id:
-                customerId,
-
-              stripe_subscription_id:
-                subscriptionId,
-
-              stripe_checkout_session_id:
-                session.id,
-
-              plan,
-
-              amount,
-
-              currency:
-                session.currency ||
-                "eur",
-
-              status:
-                session.payment_status ||
-                "paid",
-
-              paid_at:
-                new Date().toISOString(),
-            },
-          ]);
-
-        if (paymentError) {
+        if (!userId) {
           console.error(
-            "Payment record error:",
-            paymentError
+            "Не е намерен профил за прекратения абонамент:",
+            subscription.id
           );
 
-          return NextResponse.json(
-            {
-              error:
-                "Неуспешно записване на плащането.",
-            },
-            { status: 500 }
-          );
+          break;
         }
+
+        await updateProfile(
+          userId,
+          {
+            plan: "free",
+
+            subscription_plan:
+              "free",
+
+            subscription_status:
+              "canceled",
+
+            cancel_at_period_end:
+              false,
+
+            stripe_subscription_id:
+              null,
+          }
+        );
+
+        console.log(
+          `Premium е прекратен за ${userId}.`
+        );
+
+        break;
       }
 
-      console.log(
-        `Premium активиран за ${userId}: ${plan}`
-      );
+      /*
+       * Успешно първо или последващо
+       * месечно/годишно плащане.
+       */
+      case "invoice.paid": {
+        const invoice =
+          event.data
+            .object as Stripe.Invoice;
+
+        const subscriptionId =
+          getInvoiceSubscriptionId(
+            invoice
+          );
+
+        if (!subscriptionId) {
+          /*
+           * Това може да е обикновена
+           * фактура, която не е свързана
+           * с Premium абонамент.
+           */
+          break;
+        }
+
+        const subscription =
+          await stripe.subscriptions
+            .retrieve(
+              subscriptionId
+            );
+
+        const customerId =
+          getStripeId(
+            subscription.customer
+          );
+
+        const userId =
+          await findUserId({
+            metadataUserId:
+              subscription.metadata
+                ?.user_id,
+
+            subscriptionId:
+              subscription.id,
+
+            customerId,
+          });
+
+        if (!userId) {
+          console.error(
+            "Не е намерен профил за платената фактура:",
+            invoice.id
+          );
+
+          break;
+        }
+
+        const plan =
+          subscription.metadata?.plan;
+
+        const values: Record<
+          string,
+          string | boolean | null
+        > = {
+          plan: "premium",
+
+          subscription_status:
+            subscription.status,
+
+          stripe_customer_id:
+            customerId,
+
+          stripe_subscription_id:
+            subscription.id,
+
+          cancel_at_period_end:
+            subscription
+              .cancel_at_period_end,
+        };
+
+        if (isVendoraPlan(plan)) {
+          values.subscription_plan =
+            plan;
+        }
+
+        await updateProfile(
+          userId,
+          values
+        );
+
+        console.log(
+          `Успешно плащане за ${userId}: ${invoice.id}`
+        );
+
+        break;
+      }
+
+      /*
+       * Неуспешно автоматично подновяване.
+       * Не сваляме Premium веднага, защото
+       * Stripe може да направи нов опит.
+       */
+      case "invoice.payment_failed": {
+        const invoice =
+          event.data
+            .object as Stripe.Invoice;
+
+        const subscriptionId =
+          getInvoiceSubscriptionId(
+            invoice
+          );
+
+        if (!subscriptionId) {
+          break;
+        }
+
+        const subscription =
+          await stripe.subscriptions
+            .retrieve(
+              subscriptionId
+            );
+
+        const customerId =
+          getStripeId(
+            subscription.customer
+          );
+
+        const userId =
+          await findUserId({
+            metadataUserId:
+              subscription.metadata
+                ?.user_id,
+
+            subscriptionId:
+              subscription.id,
+
+            customerId,
+          });
+
+        if (!userId) {
+          console.error(
+            "Не е намерен профил за неуспешното плащане:",
+            invoice.id
+          );
+
+          break;
+        }
+
+        await updateProfile(
+          userId,
+          {
+            /*
+             * Оставяме plan: premium
+             * временно, докато Stripe
+             * прави повторни опити.
+             */
+            subscription_status:
+              "past_due",
+
+            cancel_at_period_end:
+              subscription
+                .cancel_at_period_end,
+          }
+        );
+
+        console.log(
+          `Неуспешно плащане за ${userId}: ${invoice.id}`
+        );
+
+        break;
+      }
+
+      default: {
+        console.log(
+          `Необработено Stripe събитие: ${event.type}`
+        );
+      }
     }
 
     return NextResponse.json({
