@@ -268,7 +268,7 @@ export async function POST(
 
     return NextResponse.json(
   {
-    error: `Неуспешно свързване със Stripe: ${errorMessage}`,
+   error: "Неуспешно свързване със Stripe.",
   },
   { status: 500 }
 );
