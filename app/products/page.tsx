@@ -625,6 +625,31 @@ if (createdProductId !== undefined && createdProductId !== null) {
               <option>Econt</option>
               <option>Лично предаване</option>
             </select>
+            <div className="mt-4 flex gap-3">
+  <button
+    type="button"
+    onClick={() =>
+      alert(
+        "📦 Speedy интеграцията предстои.\n\nСкоро ще можете да свържете своя Speedy профил директно във Vendora."
+      )
+    }
+    className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+  >
+    🚚 Speedy – скоро
+  </button>
+
+  <button
+    type="button"
+    onClick={() =>
+      alert(
+        "📦 Econt интеграцията предстои.\n\nСкоро ще можете да свържете своя Econt профил директно във Vendora."
+      )
+    }
+    className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+  >
+    📦 Econt – скоро
+  </button>
+</div>
           </div>
         )}
 {storeSlug && (
