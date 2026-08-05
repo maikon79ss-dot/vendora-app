@@ -283,6 +283,13 @@ if (recentOrdersError) {
           <p className="mt-2 text-lg text-gray-500">
             Вашата страница на Vendora е готова.
           </p>
+          <Link
+  href={storeUrl}
+  target="_blank"
+  className="mt-6 flex w-full items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-lg font-bold text-white transition hover:bg-blue-700"
+>
+  🌍 ОТВОРИ МАГАЗИНА
+</Link>
 <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
   <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
     <h3 className="text-xl font-bold">📦 Продукти</h3>
@@ -317,23 +324,7 @@ if (recentOrdersError) {
   </div>
 </div>
 
-<div className="mt-8">
-  <Card>
-    <h3 className="text-xl font-bold">Вашият магазин</h3>
 
-    <p className="mt-3 text-gray-600">{profile.store_name}</p>
-
-    <p className="mt-2 break-all font-semibold">{storeUrl}</p>
-
-    <Link
-      href={storeUrl}
-      target="_blank"
-      className="mt-4 inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-lg"
-    >
-      🌍 Отвори магазина
-    </Link>
-  </Card>
-</div>
 
 <div className="mt-8 grid gap-6 lg:grid-cols-2">
   <div className="min-w-0 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
