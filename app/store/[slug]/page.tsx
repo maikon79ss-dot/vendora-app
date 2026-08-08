@@ -22,17 +22,18 @@ type Props = {
 
 export default async function StorePage({ params }: Props) {
   const { slug } = await params;
+const decodedSlug = decodeURIComponent(slug);
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("*")
-    .eq("store_slug", slug)
+    .eq("store_slug", decodedSlug)
     .single();
 
   const { data: products } = await supabase
     .from("products")
     .select("*")
-    .eq("store_slug", slug)
+    .eq("store_slug", decodedSlug)
     .order("id", { ascending: false });
 const productIds = (products || []).map((product) =>
   String(product.id)
@@ -94,7 +95,7 @@ const productsWithRatings: Product[] = (products || []).map(
 
       <div>
         <h1 className="text-5xl font-bold">
-          {profile?.store_name || slug}
+          {profile?.store_name || decodedSlug}
         </h1>
 
         <p className="mt-4 text-xl">
