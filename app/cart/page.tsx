@@ -50,9 +50,24 @@ const [bankTransferInfo, setBankTransferInfo] =
     bankName: string;
     amount: number;
     checkoutId: string;
+    ownerId: string;
   } | null>(null);
 
 const [message, setMessage] = useState("");
+  const [transferSenderName, setTransferSenderName] =
+  useState("");
+
+const [transferDate, setTransferDate] =
+  useState("");
+
+const [transferReference, setTransferReference] =
+  useState("");
+
+const [transferConfirmationSent, setTransferConfirmationSent] =
+  useState(false);
+
+const [sendingTransferConfirmation, setSendingTransferConfirmation] =
+  useState(false);
 const [isSubmitting, setIsSubmitting] =
   useState(false);
 
@@ -229,6 +244,70 @@ async function sendOrderEmail(
   }
 
   return data?.email || "";
+}
+  async function sendBankTransferConfirmation() {
+  if (!bankTransferInfo) return;
+
+  if (!transferSenderName.trim() || !transferDate) {
+    setMessage(
+      "Моля, попълнете име на наредителя и дата на превода."
+    );
+    return;
+  }
+
+  setSendingTransferConfirmation(true);
+
+  try {
+   const sellerOwnerId = bankTransferInfo.ownerId; 
+
+    if (!sellerOwnerId) {
+      throw new Error(
+        "Не е намерен продавачът на поръчката."
+      );
+    }
+
+    const sellerEmail = await getSellerEmail(
+      sellerOwnerId
+    );
+
+    if (!sellerEmail) {
+      throw new Error(
+        "Не е намерен имейлът на продавача."
+      );
+    }
+
+    await sendOrderEmail(
+      sellerEmail,
+      "Потвърждение за банков превод – Vendora",
+      `Клиентът заяви, че е извършил банковия превод.
+
+Номер на поръчката: ${bankTransferInfo.checkoutId}
+Име на наредителя: ${transferSenderName}
+Дата на превода: ${transferDate}
+Референция: ${transferReference || "Не е посочена"}
+Сума: ${bankTransferInfo.amount.toFixed(2)} €
+
+Моля, проверете постъпването на средствата, преди да отбележите поръчката като платена.
+
+Vendora`
+    );
+
+    setTransferConfirmationSent(true);
+    setMessage(
+      "✅ Потвърждението за банковия превод беше изпратено на продавача."
+    );
+  } catch (error) {
+    console.error(
+      "Грешка при потвърждението на банковия превод:",
+      error
+    );
+
+    setMessage(
+      "❌ Потвърждението не можа да бъде изпратено."
+    );
+  }
+
+  setSendingTransferConfirmation(false);
 }
 async function applyCoupon() {
   const normalizedCode = couponCode.trim().toUpperCase();
@@ -647,6 +726,7 @@ if (paymentMethod === "Банков превод") {
     bankName: paymentLinks.bankName,
     amount: finalTotal,
     checkoutId,
+    ownerId: cartItems[0]?.ownerId || "",
   });
 try {
   await sendOrderEmail(
@@ -869,6 +949,64 @@ Vendora`
     <p className="mt-5 text-sm text-gray-600">
       Поръчката ще бъде обработена след потвърждение на превода от продавача.
     </p>
+    <div className="mt-6 border-t pt-6">
+  <h3 className="text-xl font-bold">
+    Вече направихте превода?
+  </h3>
+
+  <p className="mt-2 text-sm text-gray-600">
+    Изпратете данните за превода на продавача за проверка.
+  </p>
+
+  <input
+    type="text"
+    value={transferSenderName}
+    onChange={(e) =>
+      setTransferSenderName(e.target.value)
+    }
+    placeholder="Име на наредителя"
+    className="mt-4 w-full rounded-lg border bg-white p-3"
+  />
+
+  <label className="mt-4 block text-sm font-semibold">
+    Дата на превода
+  </label>
+
+  <input
+    type="date"
+    value={transferDate}
+    onChange={(e) =>
+      setTransferDate(e.target.value)
+    }
+    className="mt-2 w-full rounded-lg border bg-white p-3"
+  />
+
+  <input
+    type="text"
+    value={transferReference}
+    onChange={(e) =>
+      setTransferReference(e.target.value)
+    }
+    placeholder="Референция / номер на транзакцията (по желание)"
+    className="mt-4 w-full rounded-lg border bg-white p-3"
+  />
+
+  <button
+    type="button"
+    onClick={sendBankTransferConfirmation}
+    disabled={
+      sendingTransferConfirmation ||
+      transferConfirmationSent
+    }
+    className="mt-5 w-full rounded-lg bg-green-600 px-5 py-3 font-semibold text-white disabled:opacity-50"
+  >
+    {sendingTransferConfirmation
+      ? "Изпращане..."
+      : transferConfirmationSent
+      ? "✅ Потвърждението е изпратено"
+      : "Изпрати потвърждение за плащане"}
+  </button>
+</div>
   </div>
 )}
         <Link
