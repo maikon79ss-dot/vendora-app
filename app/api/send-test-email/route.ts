@@ -30,7 +30,7 @@ export async function POST(request: Request) {
 
     const { data, error } =
       await resend.emails.send({
-        from: "Vendora <onboarding@resend.dev>",
+        from: "Vendora <notifications@vendora.trade>",
         to: [body.to],
         subject: "Тестов имейл от Vendora",
         html: `
