@@ -531,16 +531,32 @@ async function saveTemplate() {
           .replaceAll("{STORE_NAME}", "Vendora Demo Store")}
       </p>
     </div>
-
+<input
+  type="email"
+  value={testEmail}
+  onChange={(e) => setTestEmail(e.target.value)}
+  placeholder="Въведете имейл за тест"
+  className="mt-5 w-full rounded-xl border border-gray-300 p-4"
+/>
 <button
   type="button"
   onClick={async () => {
+    if (!testEmail.trim()) {
+  setMessage("❌ Въведете имейл адрес за тест.");
+  return;
+}
     setSendingTest(true);
 
     try {
-      const response = await fetch("/api/send-test-email", {
-        method: "POST",
-      });
+    const response = await fetch("/api/send-test-email", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    to: testEmail,
+  }),
+});
 
       if (!response.ok) {
         throw new Error();
