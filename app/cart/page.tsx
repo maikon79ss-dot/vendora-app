@@ -519,7 +519,73 @@ if (paymentMethod === "Банков превод") {
     amount: finalTotal,
     checkoutId,
   });
+try {
+  await sendOrderEmail(
+    customerEmail,
+    "Данни за банков превод – Vendora",
+    `Здравейте, ${customerName}!
 
+Благодарим за вашата поръчка.
+
+Номер на поръчката: ${checkoutId}
+
+Данни за банков превод:
+Получател: ${paymentLinks.bankHolder}
+IBAN: ${paymentLinks.bankIban}
+Банка: ${paymentLinks.bankName}
+Сума: ${finalTotal.toFixed(2)} €
+
+След получаване на плащането продавачът ще обработи поръчката ви.
+
+Поздрави,
+Vendora`
+  );
+
+  const sellerOwnerId = cartItems[0]?.ownerId;
+
+  if (sellerOwnerId) {
+    const sellerEmail = await getSellerEmail(
+      sellerOwnerId
+    );
+
+    if (sellerEmail) {
+      const productsText = cartItems
+        .map(
+          (item) =>
+            `${item.name} × ${item.quantity}`
+        )
+        .join("\n");
+
+      await sendOrderEmail(
+        sellerEmail,
+        "Нова поръчка с банков превод – Vendora",
+        `Получихте нова поръчка.
+
+Клиент: ${customerName}
+Имейл: ${customerEmail}
+Телефон: ${customerPhone}
+Адрес: ${address}, ${city}
+Пощенски код: ${postalCode || "-"}
+
+Продукти:
+${productsText}
+
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: Банков превод
+Номер на поръчката: ${checkoutId}
+
+Очаква се банков превод от клиента.
+
+Vendora`
+      );
+    }
+  }
+} catch (emailError) {
+  console.error(
+    "Грешка при имейлите за банков превод:",
+    emailError
+  );
+}
   clearCart();
   setShowCheckoutForm(false);
   setCouponCode("");
