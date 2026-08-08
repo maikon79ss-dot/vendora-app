@@ -552,6 +552,82 @@ Vendora`
   window.location.href = paymentLinks.paypal;
   return;
 }
+  if (paymentMethod === "Revolut") {
+  if (!paymentLinks.revolut) {
+    setMessage(
+      "Продавачът не е настроил Revolut."
+    );
+    setIsSubmitting(false);
+    return;
+  }
+
+  try {
+    await sendOrderEmail(
+      customerEmail,
+      "Поръчката ви във Vendora – Revolut",
+      `Здравейте, ${customerName}!
+
+Вашата поръчка е записана.
+
+Номер на поръчката: ${checkoutId}
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: Revolut
+
+Сега ще бъдете прехвърлени към Revolut, за да извършите плащането.
+
+Поздрави,
+Vendora`
+    );
+
+    const sellerOwnerId = cartItems[0]?.ownerId;
+
+    if (sellerOwnerId) {
+      const sellerEmail = await getSellerEmail(
+        sellerOwnerId
+      );
+
+      if (sellerEmail) {
+        const productsText = cartItems
+          .map(
+            (item) =>
+              `${item.name} × ${item.quantity}`
+          )
+          .join("\n");
+
+        await sendOrderEmail(
+          sellerEmail,
+          "Нова Revolut поръчка във Vendora",
+          `Получихте нова поръчка.
+
+Клиент: ${customerName}
+Имейл: ${customerEmail}
+Телефон: ${customerPhone}
+Адрес: ${address}, ${city}
+Пощенски код: ${postalCode || "-"}
+
+Продукти:
+${productsText}
+
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: Revolut
+Номер на поръчката: ${checkoutId}
+
+Поръчката е създадена и клиентът е пренасочен към Revolut.
+
+Vendora`
+        );
+      }
+    }
+  } catch (emailError) {
+    console.error(
+      "Грешка при Revolut имейлите:",
+      emailError
+    );
+  }
+
+  window.location.href = paymentLinks.revolut;
+  return;
+}
 if (paymentMethod === "Банков превод") {
   if (
     !paymentLinks.bankHolder ||
