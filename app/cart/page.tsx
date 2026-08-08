@@ -213,6 +213,23 @@ async function sendOrderEmail(
 
   console.log("Имейлът е изпратен:", result);
 }
+  async function getSellerEmail(ownerId: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", ownerId)
+    .single();
+
+  if (error) {
+    console.error(
+      "Грешка при намиране на имейла на продавача:",
+      error
+    );
+    return "";
+  }
+
+  return data?.email || "";
+}
 async function applyCoupon() {
   const normalizedCode = couponCode.trim().toUpperCase();
 
@@ -536,6 +553,51 @@ Vendora`
 
   setMessage(
     "Поръчката е записана, но имейлът не беше изпратен."
+  );
+}
+  try {
+  const sellerOwnerId = cartItems[0]?.ownerId;
+
+  if (sellerOwnerId) {
+    const sellerEmail = await getSellerEmail(
+      sellerOwnerId
+    );
+
+    if (sellerEmail) {
+      const productsText = cartItems
+        .map(
+          (item) =>
+            `${item.name} × ${item.quantity}`
+        )
+        .join("\n");
+
+      await sendOrderEmail(
+        sellerEmail,
+        "Нова поръчка във Vendora",
+        `Получихте нова поръчка.
+
+Клиент: ${customerName}
+Имейл: ${customerEmail}
+Телефон: ${customerPhone}
+Адрес: ${address}, ${city}
+Пощенски код: ${postalCode || "-"}
+
+Продукти:
+${productsText}
+
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: ${paymentMethod}
+
+Номер на поръчката: ${checkoutId}
+
+Vendora`
+      );
+    }
+  }
+} catch (sellerEmailError) {
+  console.error(
+    "Имейлът към продавача не беше изпратен:",
+    sellerEmailError
   );
 }
   if (appliedCoupon) {
