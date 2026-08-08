@@ -475,6 +475,7 @@ if (paymentMethod === "Stripe") {
   }
 }
 
+
 if (paymentMethod === "PayPal") {
   if (!paymentLinks.paypal) {
     setMessage(
@@ -484,19 +485,71 @@ if (paymentMethod === "PayPal") {
     return;
   }
 
-  window.location.href = paymentLinks.paypal;
-  return;
-}
-if (paymentMethod === "Revolut") {
-  if (!paymentLinks.revolut) {
-    setMessage(
-      "Продавачът не е настроил Revolut."
+  try {
+    await sendOrderEmail(
+      customerEmail,
+      "Поръчката ви във Vendora – PayPal",
+      `Здравейте, ${customerName}!
+
+Вашата поръчка е записана.
+
+Номер на поръчката: ${checkoutId}
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: PayPal
+
+Сега ще бъдете прехвърлени към PayPal, за да извършите плащането.
+
+Поздрави,
+Vendora`
     );
-    setIsSubmitting(false);
-    return;
+
+    const sellerOwnerId = cartItems[0]?.ownerId;
+
+    if (sellerOwnerId) {
+      const sellerEmail = await getSellerEmail(
+        sellerOwnerId
+      );
+
+      if (sellerEmail) {
+        const productsText = cartItems
+          .map(
+            (item) =>
+              `${item.name} × ${item.quantity}`
+          )
+          .join("\n");
+
+        await sendOrderEmail(
+          sellerEmail,
+          "Нова PayPal поръчка във Vendora",
+          `Получихте нова поръчка.
+
+Клиент: ${customerName}
+Имейл: ${customerEmail}
+Телефон: ${customerPhone}
+Адрес: ${address}, ${city}
+Пощенски код: ${postalCode || "-"}
+
+Продукти:
+${productsText}
+
+Обща стойност: ${finalTotal.toFixed(2)} €
+Начин на плащане: PayPal
+Номер на поръчката: ${checkoutId}
+
+Поръчката е създадена и клиентът е пренасочен към PayPal.
+
+Vendora`
+        );
+      }
+    }
+  } catch (emailError) {
+    console.error(
+      "Грешка при PayPal имейлите:",
+      emailError
+    );
   }
 
-  window.location.href = paymentLinks.revolut;
+  window.location.href = paymentLinks.paypal;
   return;
 }
 if (paymentMethod === "Банков превод") {
