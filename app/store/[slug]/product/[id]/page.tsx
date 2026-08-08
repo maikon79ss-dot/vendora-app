@@ -35,9 +35,9 @@ type ProductReview = {
   created_at: string;
 };
 export default function ProductDetailsPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-  const id = params.id as string;
+const params = useParams();
+const slug = decodeURIComponent(params.slug as string);
+const id = params.id as string;
 const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [sellerEmail, setSellerEmail] = useState("");
