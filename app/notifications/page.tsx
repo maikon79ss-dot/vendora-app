@@ -27,6 +27,7 @@ export default function NotificationsPage() {
   const [notifyCancelledOrder, setNotifyCancelledOrder] = useState(true);
   const [notifyAdminCopy, setNotifyAdminCopy] = useState(false);
 const [sendingTest, setSendingTest] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
