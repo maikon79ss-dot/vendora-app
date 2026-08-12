@@ -40,12 +40,57 @@ export default function Home() {
             </Link>
           </nav>
 
-          <Link
-            href="/login"
-            className="rounded-xl border border-white/20 px-4 py-2 text-sm font-bold md:hidden"
-          >
-            Вход
-          </Link>
+         <div className="flex items-center gap-3 md:hidden">
+  <Link
+    href="/login"
+    className="rounded-xl border border-white/20 px-4 py-2 text-sm font-bold"
+  >
+    Вход
+  </Link>
+
+  <details className="relative">
+    <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-white/20 text-xl">
+      ☰
+    </summary>
+
+    <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 p-2 shadow-2xl">
+      <Link
+        href="/plan"
+        className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
+      >
+        ⭐ Планове
+      </Link>
+
+      <Link
+        href="/ai"
+        className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
+      >
+        ✨ Попитай AI
+      </Link>
+
+      <Link
+        href="/contact"
+        className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
+      >
+        ✉️ Контакти
+      </Link>
+
+      <Link
+        href="/login"
+        className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
+      >
+        👤 Вход
+      </Link>
+
+      <Link
+        href="/register"
+        className="mt-2 block rounded-xl bg-blue-600 px-4 py-3 text-center font-bold text-white"
+      >
+        Започни безплатно
+      </Link>
+    </div>
+  </details>
+</div>
         </div>
       </header>
 
