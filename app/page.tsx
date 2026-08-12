@@ -1,171 +1,276 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      {/* Мобилна версия */}
-      <section className="flex min-h-screen flex-col px-5 py-5 md:hidden">
-        <header className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-2xl font-extrabold tracking-tight"
-          >
-            Vendora
+    <main className="min-h-screen overflow-hidden bg-slate-950 text-white">
+      {/* Header */}
+      <header className="border-b border-white/10">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
+          <Link href="/" className="group">
+            <div className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+              VENDORA
+            </div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-400">
+              Създай своя магазин
+            </div>
           </Link>
 
-          <Link
-            href="/login"
-            className="rounded-lg border border-white/30 px-4 py-2 text-sm font-semibold"
-          >
-            Вход
-          </Link>
-        </header>
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-300 md:flex">
+            <Link href="/plan" className="transition hover:text-white">
+              Планове
+            </Link>
 
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-600 text-4xl shadow-xl">
-            🛍️
-          </div>
+            <Link href="/ai" className="transition hover:text-white">
+              Попитай AI
+            </Link>
 
-          <h1 className="max-w-sm text-4xl font-extrabold leading-tight">
-            Създай своя онлайн магазин
-          </h1>
+            <Link href="/contact" className="transition hover:text-white">
+              Контакти
+            </Link>
 
-          <p className="mt-5 max-w-sm text-lg leading-7 text-slate-300">
-            Добавяй физически и дигитални продукти, приемай поръчки
-            и споделяй собствен магазин само с един линк.
-          </p>
+            <Link href="/login" className="transition hover:text-white">
+              Вход
+            </Link>
 
-          <div className="mt-8 flex w-full max-w-sm flex-col gap-4">
             <Link
               href="/register"
-              className="w-full rounded-xl bg-blue-600 px-6 py-4 text-center font-bold text-white shadow-lg"
+              className="rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-500"
             >
               Започни безплатно
             </Link>
-
-            <Link
-              href="/store/demo"
-              className="w-full rounded-xl border border-white/30 bg-white/10 px-6 py-4 text-center font-bold"
-            >
-              Виж демо магазин
-            </Link>
-          </div>
-
-          <div className="mt-10 grid w-full max-w-sm grid-cols-2 gap-3 text-sm">
-            <Link
-              href="/plan"
-              className="rounded-xl bg-white/10 p-4 font-semibold"
-            >
-              ⭐ Планове
-            </Link>
-
-            <Link
-              href="/ai"
-              className="rounded-xl bg-white/10 p-4 font-semibold"
-            >
-              ✨ Попитай AI
-            </Link>
-
-            <Link
-              href="/contact"
-              className="rounded-xl bg-white/10 p-4 font-semibold"
-            >
-              ✉️ Контакти
-            </Link>
-
-            <Link
-              href="/login"
-              className="rounded-xl bg-white/10 p-4 font-semibold"
-            >
-              👤 Моят профил
-            </Link>
-          </div>
-        </div>
-
-        <footer className="mt-8 border-t border-white/10 pt-5 text-center text-sm text-slate-400">
-          <a href="mailto:maikon79ss@gmail.com">
-            maikon79ss@gmail.com
-          </a>
-        </footer>
-      </section>
-
-      {/* Десктоп версия */}
-      <section className="hidden h-screen w-screen overflow-hidden md:block">
-        <div className="relative h-full w-full">
-          <Image
-            src="/vendora-home-new.png"
-            alt="Начална страница на Vendora"
-            fill
-            priority
-            sizes="100vw"
-            className="object-fill"
-          />
-
-          <Link
-            href="/"
-            aria-label="Начална страница"
-            title="Vendora"
-            className="absolute left-[2%] top-[2%] h-[9%] w-[25%]"
-          />
-
-          <Link
-            href="/plan"
-            aria-label="Планове"
-            title="План"
-            className="absolute left-[47%] top-[3%] h-[7%] w-[7%]"
-          />
+          </nav>
 
           <Link
             href="/login"
-            aria-label="Вход"
-            title="Вход"
-            className="absolute left-[54%] top-[3%] h-[7%] w-[7%]"
-          />
+            className="rounded-xl border border-white/20 px-4 py-2 text-sm font-bold md:hidden"
+          >
+            Вход
+          </Link>
+        </div>
+      </header>
 
-          <Link
-            href="/register"
-            aria-label="Започни безплатно"
-            title="Започни безплатно"
-            className="absolute left-[61%] top-[3%] h-[7%] w-[16%]"
-          />
+      {/* Hero */}
+      <section className="relative">
+        <div className="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/20 blur-3xl" />
 
-          <Link
-            href="/ai"
-            aria-label="Попитай AI"
-            title="Попитай AI"
-            className="absolute left-[76%] top-[3%] h-[7%] w-[11%]"
-          />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-16 lg:grid-cols-2 lg:px-8 lg:py-24">
+          {/* Hero text */}
+          <div>
+            <div className="mb-6 inline-flex rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+              Онлайн магазин без програмиране
+            </div>
 
-          <Link
-            href="/contact"
-            aria-label="Контакти"
-            title="Контакти"
-            className="absolute left-[88%] top-[3%] h-[7%] w-[10%]"
-          />
+            <h1 className="max-w-3xl text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+              Създай своя
+              <span className="block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                онлайн магазин
+              </span>
+              за минути.
+            </h1>
 
-          <Link
-            href="/register"
-            aria-label="Започни безплатно"
-            title="Започни безплатно"
-            className="absolute left-[47%] top-[59%] h-[8%] w-[21%] rounded-2xl"
-          />
+            <p className="mt-7 max-w-xl text-lg leading-8 text-slate-300 sm:text-xl">
+              Добавяй физически и дигитални продукти, приемай поръчки
+              и развивай своя бизнес от едно място.
+            </p>
 
-          <Link
-            href="/store/demo"
-            aria-label="Виж демо магазин"
-            title="Виж демо магазин"
-            className="absolute left-[70%] top-[59%] h-[8%] w-[21%] rounded-2xl"
-          />
+            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/register"
+                className="rounded-xl bg-blue-600 px-7 py-4 text-center text-base font-bold shadow-lg shadow-blue-600/20 transition hover:bg-blue-500"
+              >
+                Започни безплатно
+              </Link>
 
-          <a
-            href="mailto:maikon79ss@gmail.com"
-            aria-label="Изпрати имейл до Vendora"
-            title="maikon79ss@gmail.com"
-            className="absolute left-[40%] top-[84%] h-[6%] w-[20%]"
-          />
+              <Link
+                href="/store/demo"
+                className="rounded-xl border border-white/20 bg-white/5 px-7 py-4 text-center text-base font-bold transition hover:bg-white/10"
+              >
+                Виж демо магазин
+              </Link>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400">
+              <span>✓ Без програмиране</span>
+              <span>✓ Безплатен план</span>
+              <span>✓ Готов за мобилни устройства</span>
+            </div>
+          </div>
+
+          {/* Dashboard mockup */}
+          <div className="relative mx-auto w-full max-w-xl">
+            <div className="absolute -inset-6 rounded-[3rem] bg-blue-600/10 blur-3xl" />
+
+            <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+                <div>
+                  <p className="text-xs uppercase tracking-widest text-slate-500">
+                    Твоят магазин
+                  </p>
+                  <p className="mt-1 text-xl font-bold">
+                    My Store
+                  </p>
+                </div>
+
+                <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
+                  ● Онлайн
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 p-5 sm:p-6">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="text-3xl">🛍️</div>
+                  <p className="mt-5 text-sm text-slate-400">
+                    Продукти
+                  </p>
+                  <p className="mt-1 text-2xl font-black">24</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="text-3xl">📦</div>
+                  <p className="mt-5 text-sm text-slate-400">
+                    Поръчки
+                  </p>
+                  <p className="mt-1 text-2xl font-black">12</p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="text-3xl">💳</div>
+                  <p className="mt-5 text-sm text-slate-400">
+                    Плащания
+                  </p>
+                  <p className="mt-1 text-lg font-black text-blue-300">
+                    Лесно
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="text-3xl">📱</div>
+                  <p className="mt-5 text-sm text-slate-400">
+                    Мобилен
+                  </p>
+                  <p className="mt-1 text-lg font-black text-blue-300">
+                    Responsive
+                  </p>
+                </div>
+              </div>
+
+              <div className="mx-5 mb-5 rounded-2xl bg-gradient-to-r from-blue-600/20 to-cyan-500/10 p-5 sm:mx-6 sm:mb-6">
+                <p className="font-bold">
+                  Всичко необходимо на едно място
+                </p>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  Управлявай продуктите, поръчките и магазина си
+                  от един лесен за използване панел.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* Features */}
+      <section className="border-y border-white/10 bg-white/[0.02]">
+        <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-bold uppercase tracking-widest text-blue-400">
+              Vendora
+            </p>
+
+            <h2 className="mt-3 text-3xl font-black sm:text-4xl">
+              Всичко необходимо за твоя онлайн бизнес
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: "🛍️",
+                title: "Продукти",
+                text: "Добавяй физически и дигитални продукти.",
+              },
+              {
+                icon: "📦",
+                title: "Поръчки",
+                text: "Получавай и управлявай поръчките си.",
+              },
+              {
+                icon: "💳",
+                title: "Плащания",
+                text: "Предлагай различни начини за плащане.",
+              },
+              {
+                icon: "✨",
+                title: "AI помощник",
+                text: "Получавай помощ директно във Vendora.",
+              },
+            ].map((feature) => (
+              <div
+                key={feature.title}
+                className="rounded-2xl border border-white/10 bg-slate-900/70 p-6"
+              >
+                <div className="text-3xl">{feature.icon}</div>
+
+                <h3 className="mt-5 text-xl font-bold">
+                  {feature.title}
+                </h3>
+
+                <p className="mt-3 leading-7 text-slate-400">
+                  {feature.text}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Free plan */}
+      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+        <div className="overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-600/20 via-slate-900 to-slate-900 p-8 text-center sm:p-12">
+          <p className="font-bold text-blue-300">
+            Започни безплатно
+          </p>
+
+          <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black sm:text-4xl">
+            Не ти е необходим кратък пробен период.
+          </h2>
+
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+            Стартирай с безплатния план и премини към повече
+            възможности, когато бизнесът ти има нужда от тях.
+          </p>
+
+          <Link
+            href="/register"
+            className="mt-8 inline-block rounded-xl bg-blue-600 px-8 py-4 font-bold transition hover:bg-blue-500"
+          >
+            Създай своя магазин
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+          <div>
+            <span className="font-bold text-white">VENDORA</span>
+            <span className="ml-3">© 2026</span>
+          </div>
+
+          <div className="flex flex-wrap gap-5">
+            <Link href="/plan" className="hover:text-white">
+              Планове
+            </Link>
+
+            <Link href="/contact" className="hover:text-white">
+              Контакти
+            </Link>
+
+            <Link href="/login" className="hover:text-white">
+              Вход
+            </Link>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
