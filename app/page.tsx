@@ -267,7 +267,65 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* How it works */}
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-bold uppercase tracking-widest text-blue-400">
+              Лесно начало
+            </p>
 
+            <h2 className="mt-3 text-3xl font-black sm:text-4xl">
+              Как работи Vendora?
+            </h2>
+
+            <p className="mt-5 text-lg leading-8 text-slate-400">
+              От идея до собствен онлайн магазин само в няколко стъпки.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-7 text-center">
+              <div className="text-4xl">👤</div>
+              <div className="mt-5 text-sm font-bold text-blue-400">
+                СТЪПКА 1
+              </div>
+              <h3 className="mt-2 text-xl font-bold">
+                Създай профил
+              </h3>
+              <p className="mt-3 leading-7 text-slate-400">
+                Регистрирай се безплатно и създай своя магазин във Vendora.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-7 text-center">
+              <div className="text-4xl">🛍️</div>
+              <div className="mt-5 text-sm font-bold text-blue-400">
+                СТЪПКА 2
+              </div>
+              <h3 className="mt-2 text-xl font-bold">
+                Добави продуктите си
+              </h3>
+              <p className="mt-3 leading-7 text-slate-400">
+                Качи снимки, добави описание и определи цената на продуктите си.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-7 text-center">
+              <div className="text-4xl">🚀</div>
+              <div className="mt-5 text-sm font-bold text-blue-400">
+                СТЪПКА 3
+              </div>
+              <h3 className="mt-2 text-xl font-bold">
+                Започни да продаваш
+              </h3>
+              <p className="mt-3 leading-7 text-slate-400">
+                Сподели магазина си и започни да приемаш поръчки от клиентите си.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Free plan */}
       <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
         <div className="overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-600/20 via-slate-900 to-slate-900 p-8 text-center sm:p-12">
