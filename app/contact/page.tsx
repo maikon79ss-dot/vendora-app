@@ -27,7 +27,7 @@ async function sendMessage(event: React.FormEvent) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        to: "maikon79ss@gmail.com",
+        to: "hello_vendora.trade@abv.bg",
         subject: `Vendora Contact: ${subject}`,
         message: `Име: ${name}
 
@@ -82,10 +82,10 @@ ${message}`,
           </p>
 
           <a
-            href="mailto:maikon79ss@gmail.com"
+            href="mailto:hello_vendora.trade@abv.bg"
             className="mt-5 inline-block text-lg font-bold text-blue-600 hover:underline"
           >
-            ✉ maikon79ss@gmail.com
+            ✉ hello_vendora.trade@abv.bg
           </a>
 
           <form onSubmit={sendMessage} className="mt-8 space-y-5">
