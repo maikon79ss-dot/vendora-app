@@ -348,7 +348,12 @@ export default function Home() {
             Стартирай с безплатния план и премини към повече
             възможности, когато бизнесът ти има нужда от тях.
           </p>
-
+<Link
+  href="/bezplaten-online-magazin"
+  className="mt-5 block font-semibold text-blue-400 transition hover:text-blue-300"
+>
+  Научи повече за безплатния онлайн магазин →
+</Link>
           <Link
             href="/register"
             className="mt-8 inline-block rounded-xl bg-blue-600 px-8 py-4 font-bold transition hover:bg-blue-500"
