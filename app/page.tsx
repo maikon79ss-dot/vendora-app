@@ -331,6 +331,14 @@ export default function Home() {
               </p>
             </div>
           </div>
+          <div className="mt-10 text-center">
+  <Link
+    href="/kak-da-prodavash-online"
+    className="font-semibold text-blue-400 transition hover:text-blue-300"
+  >
+    Виж практично ръководство как да продаваш онлайн →
+  </Link>
+</div>
         </div>
       </section>
       {/* Free plan */}
