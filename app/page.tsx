@@ -106,11 +106,11 @@ export default function Home() {
             </div>
 
             <h1 className="max-w-3xl text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-              Създай своя
+              Създай 
               <span className="block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
                 онлайн магазин
               </span>
-              за минути.
+               без програмиране.
             </h1>
 
             <p className="mt-7 max-w-xl text-lg leading-8 text-slate-300 sm:text-xl">
@@ -222,7 +222,7 @@ export default function Home() {
             </p>
 
             <h2 className="mt-3 text-3xl font-black sm:text-4xl">
-              Всичко необходимо за твоя онлайн бизнес
+              Всичко необходимо за успешен онлайн магазин
             </h2>
           </div>
 
@@ -334,7 +334,7 @@ export default function Home() {
           </p>
 
           <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black sm:text-4xl">
-            Не ти е необходим кратък пробен период.
+            Започни с безплатен онлайн магазин.
           </h2>
 
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
