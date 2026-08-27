@@ -14,6 +14,12 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 1,
   },
   {
+    url: `${baseUrl}/sazdai-online-magazin`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  },
+  {
     url: `${baseUrl}/plan`,
     lastModified: new Date(),
     changeFrequency: "weekly",
