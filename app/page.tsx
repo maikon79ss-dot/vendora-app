@@ -275,14 +275,21 @@ export default function Home() {
               Лесно начало
             </p>
 
-            <h2 className="mt-3 text-3xl font-black sm:text-4xl">
-              Как работи Vendora?
-            </h2>
+           <h2 className="mt-3 text-3xl font-black sm:text-4xl">
+  Как работи Vendora?
+</h2>
 
-            <p className="mt-5 text-lg leading-8 text-slate-400">
-              От идея до собствен онлайн магазин само в няколко стъпки.
-            </p>
-          </div>
+<p className="mt-5 text-lg leading-8 text-slate-400">
+  От идея до собствен онлайн магазин само в няколко стъпки.
+</p>
+
+<Link
+  href="/sazdai-online-magazin"
+  className="mt-5 inline-block font-semibold text-blue-400 transition hover:text-blue-300"
+>
+  Научи повече как да създадеш онлайн магазин →
+</Link>
+</div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-7 text-center">
