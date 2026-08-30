@@ -408,22 +408,53 @@ async function applyCoupon() {
 async function submitCheckout(e: React.FormEvent) {
   e.preventDefault();
 
-  if (
-    !customerName ||
-    !customerEmail ||
-    !customerPhone ||
-    !address ||
-    !city
-  ) {
-    setMessage("Моля, попълнете всички задължителни полета.");
-    return;
-  }
+ if (
+  !customerName ||
+  !customerEmail ||
+  !customerPhone
+) {
+  setMessage("Моля, попълнете всички задължителни полета.");
+  return;
+}
+
+if (
+  deliveryMethod === "Доставка до адрес" &&
+  (!address || !city)
+) {
+  setMessage("Моля, попълнете адрес и град.");
+  return;
+}
+
+if (
+  deliveryMethod === "Econt офис" &&
+  !econtSelection
+) {
+  setMessage("Моля, изберете населено място и офис на Econt.");
+  return;
+}
 
   if (cartItems.length === 0) {
     setMessage("Количката е празна.");
     return;
   }
+const orderAddress =
+  deliveryMethod === "Econt офис" && econtSelection
+    ? `Econt офис: ${econtSelection.officeName}${
+        econtSelection.officeAddress
+          ? ` — ${econtSelection.officeAddress}`
+          : ""
+      }`
+    : address;
 
+const orderCity =
+  deliveryMethod === "Econt офис" && econtSelection
+    ? econtSelection.cityName
+    : city;
+
+const orderPostalCode =
+  deliveryMethod === "Econt офис" && econtSelection
+    ? econtSelection.postCode || ""
+    : postalCode;
   setIsSubmitting(true);
   setMessage("");
 
@@ -451,9 +482,9 @@ async function submitCheckout(e: React.FormEvent) {
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-      address,
-      city,
-      postal_code: postalCode,
+    address: orderAddress,
+city: orderCity,
+postal_code: orderPostalCode,
       quantity: item.quantity,
       variant: item.variant,
       payment_method: paymentMethod,
