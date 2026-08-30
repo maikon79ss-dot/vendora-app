@@ -235,6 +235,34 @@ Vendora`,
     alert("❌ Неуспешно копиране.");
   }
 }
+ function checkEcontShipment(order: Order) {
+  if (!order.address?.startsWith("Econt офис:")) {
+    alert("Тази поръчка не е за доставка до офис на Econt.");
+    return;
+  }
+
+  if (
+    !order.customer_name ||
+    !order.customer_phone ||
+    !order.city ||
+    !order.address
+  ) {
+    alert(
+      "Липсват данни, необходими за създаване на Econt пратка."
+    );
+    return;
+  }
+
+  alert(
+    `✅ Поръчката е готова за Econt.
+
+Клиент: ${order.customer_name}
+Телефон: ${order.customer_phone}
+Град: ${order.city}
+Доставка: ${order.address}
+Пощенски код: ${order.postal_code || "-"}`
+  );
+} 
 function generateOrderPDF(orderGroup: Order[]) {
   const firstOrder = orderGroup[0];
 
@@ -471,6 +499,15 @@ function generateOrderPDF(orderGroup: Order[]) {
   >
     📋 Копирай адрес
   </button>
+  {firstOrder.address?.startsWith("Econt офис:") && (
+  <button
+    type="button"
+    onClick={() => checkEcontShipment(firstOrder)}
+    className="ml-2 mt-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700"
+  >
+    📦 Econt
+  </button>
+)}            
 </div>
 
             <p className="mt-3 text-sm text-gray-500">
