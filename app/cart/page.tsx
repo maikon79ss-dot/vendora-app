@@ -643,8 +643,8 @@ Vendora`
 Клиент: ${customerName}
 Имейл: ${customerEmail}
 Телефон: ${customerPhone}
-Адрес: ${address}, ${city}
-Пощенски код: ${postalCode || "-"}
+Адрес / доставка: ${orderAddress}, ${orderCity}
+Пощенски код: ${orderPostalCode || "-"}
 
 Продукти:
 ${productsText}
@@ -719,8 +719,8 @@ Vendora`
 Клиент: ${customerName}
 Имейл: ${customerEmail}
 Телефон: ${customerPhone}
-Адрес: ${address}, ${city}
-Пощенски код: ${postalCode || "-"}
+Адрес / доставка: ${orderAddress}, ${orderCity}
+Пощенски код: ${orderPostalCode || "-"}
 
 Продукти:
 ${productsText}
@@ -811,8 +811,8 @@ Vendora`
 Клиент: ${customerName}
 Имейл: ${customerEmail}
 Телефон: ${customerPhone}
-Адрес: ${address}, ${city}
-Пощенски код: ${postalCode || "-"}
+Адрес / доставка: ${orderAddress}, ${orderCity}
+Пощенски код: ${orderPostalCode || "-"}
 
 Продукти:
 ${productsText}
@@ -892,8 +892,8 @@ Vendora`
 Клиент: ${customerName}
 Имейл: ${customerEmail}
 Телефон: ${customerPhone}
-Адрес: ${address}, ${city}
-Пощенски код: ${postalCode || "-"}
+Адрес / доставка: ${orderAddress}, ${orderCity}
+Пощенски код: ${orderPostalCode || "-"}
 
 Продукти:
 ${productsText}
