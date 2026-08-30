@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 import { supabase } from "@/lib/supabaseClient";
-
+import EcontDeliveryPicker, {
+  type EcontSelection,
+} from "@/app/products/components/EcontDeliveryPicker";
 export default function CartPage() {
   const {
     cartItems,
@@ -22,6 +24,11 @@ export default function CartPage() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [deliveryMethod, setDeliveryMethod] =
+  useState("Доставка до адрес");
+
+const [econtSelection, setEcontSelection] =
+  useState<EcontSelection | null>(null);
 const [paymentMethod, setPaymentMethod] =
   useState("");
 
@@ -1216,7 +1223,39 @@ Vendora`
               placeholder="Телефон"
               className="mb-4 w-full rounded-lg border p-3"
             />
+<label className="mb-2 block font-semibold">
+  Начин на доставка
+</label>
 
+<select
+  value={deliveryMethod}
+  onChange={(e) => {
+    const nextMethod = e.target.value;
+
+    setDeliveryMethod(nextMethod);
+
+    if (nextMethod !== "Econt офис") {
+      setEcontSelection(null);
+    }
+  }}
+  className="mb-4 w-full rounded-lg border p-3"
+>
+  <option>Доставка до адрес</option>
+  <option>Econt офис</option>
+</select>
+
+{deliveryMethod === "Econt офис" && (
+  <EcontDeliveryPicker
+    onChange={setEcontSelection}
+  />
+)}
+
+{deliveryMethod === "Econt офис" && econtSelection && (
+  <p className="mb-4 mt-3 text-sm font-semibold text-green-700">
+    ✅ Избрана доставка: {econtSelection.cityName} →{" "}
+    {econtSelection.officeName}
+  </p>
+)}
             <input
               value={address}
               onChange={(e) => setAddress(e.target.value)}
