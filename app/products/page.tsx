@@ -638,17 +638,38 @@ if (createdProductId !== undefined && createdProductId !== null) {
     🚚 Speedy – скоро
   </button>
 
-  <button
-    type="button"
-    onClick={() =>
+<button
+  type="button"
+  onClick={async () => {
+    try {
+      const response = await fetch("/api/econt/offices", {
+        cache: "no-store",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        alert(
+          "❌ Неуспешна връзка с Econt.\n\nМоля, опитайте отново."
+        );
+        return;
+      }
+
       alert(
-        "📦 Econt интеграцията предстои.\n\nСкоро ще можете да свържете своя Econt профил директно във Vendora."
-      )
+        `✅ Връзката с Econt е активна.\n\nНамерени офиси: ${data.officeCount}`
+      );
+    } catch (error) {
+      console.error("Econt connection test error:", error);
+
+      alert(
+        "❌ Неуспешна връзка с Econt.\n\nМоля, опитайте отново."
+      );
     }
-    className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-  >
-    📦 Econt – скоро
-  </button>
+  }}
+  className="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+>
+  📦 Econt – провери връзката
+</button>
 </div>
           </div>
         )}
