@@ -51,6 +51,8 @@ const [bankTransferEnabled, setBankTransferEnabled] =
 
 const [codEnabled, setCodEnabled] =
   useState(true);
+  const [econtEnabled, setEcontEnabled] =
+  useState(false);
   const [paypalPaymentLink, setPaypalPaymentLink] =
   useState("");
 
@@ -312,6 +314,7 @@ setBankTransferEnabled(
 );
 
 setCodEnabled(data?.cod_enabled ?? true);
+    setEcontEnabled(data?.econt_enabled ?? false);
 setPaypalPaymentLink(
   data?.paypal_payment_link || ""
 );
@@ -667,6 +670,7 @@ bank_name:
   bankName.trim(),
 
 cod_enabled: codEnabled,
+        econt_enabled: econtEnabled,
         logo_url: newLogoUrl,
         banner_url: newBannerUrl,
 
@@ -778,7 +782,28 @@ if (loading) {
   codEnabled={codEnabled}
   onCodEnabledChange={setCodEnabled}
 />
+<div className="rounded-2xl bg-white p-6 shadow">
+  <h2 className="text-2xl font-bold">
+    📦 Доставка с Econt
+  </h2>
 
+  <p className="mt-2 text-gray-600">
+    Разрешете на клиентите да избират офис на Econt при поръчка.
+  </p>
+
+  <label className="mt-5 flex items-center gap-3">
+    <input
+      type="checkbox"
+      checked={econtEnabled}
+      onChange={(e) => setEcontEnabled(e.target.checked)}
+      className="h-5 w-5"
+    />
+
+    <span className="font-semibold">
+      Разреши Econt за моя магазин
+    </span>
+  </label>
+</div>
           <SocialSettings
             facebook={facebook}
             instagram={instagram}
