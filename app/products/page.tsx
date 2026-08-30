@@ -1,5 +1,7 @@
 "use client";
-import EcontDeliveryPicker from "./components/EcontDeliveryPicker";
+import EcontDeliveryPicker, {
+  type EcontSelection,
+} from "./components/EcontDeliveryPicker";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -26,6 +28,8 @@ type Product = {
 export default function Products() {
   const router = useRouter();
 const [deliveryMethod, setDeliveryMethod] = useState("Наложен платеж");
+  const [econtSelection, setEcontSelection] =
+  useState<EcontSelection | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [productType, setProductType] = useState("physical");
   const [category, setCategory] = useState("Без категория");
@@ -599,41 +603,56 @@ if (createdProductId !== undefined && createdProductId !== null) {
               <option value="Материал">Материал</option>
               <option value="Собствен">Собствен вариант</option>
             </select>
+<label className="mb-2 block font-semibold">
+  Стойности на варианта
+</label>
 
-            <label className="mb-2 block font-semibold">
-              Стойности на варианта
-            </label>
-
-            <input
-              value={variantValues}
-              onChange={(e) => setVariantValues(e.target.value)}
-              placeholder="Например: S, M, L, XL или 128GB, 256GB"
-              className="w-full rounded-lg border p-3"
-            />
-          </div>
-        )}
-
-        {productType === "physical" && (
-          <div className="mb-6">
-            <label className="mb-2 block font-semibold">
-              Начин на доставка
-            </label>
-
-           <select
-  value={deliveryMethod}
-  onChange={(e) => setDeliveryMethod(e.target.value)}
+<input
+  value={variantValues}
+  onChange={(e) => setVariantValues(e.target.value)}
+  placeholder="Например: S, M, L, XL или 128GB, 256GB"
   className="w-full rounded-lg border p-3"
->
-  <option>Наложен платеж</option>
-  <option>Speedy</option>
-  <option>Econt</option>
-  <option>Лично предаване</option>
-</select>
+/>
+</div>
+)}
+
+{productType === "physical" && (
+  <div className="mb-6">
+    <label className="mb-2 block font-semibold">
+      Начин на доставка
+    </label>
+
+    <select
+      value={deliveryMethod}
+      onChange={(e) => {
+        const nextMethod = e.target.value;
+
+        setDeliveryMethod(nextMethod);
+
+        if (nextMethod !== "Econt") {
+          setEcontSelection(null);
+        }
+      }}
+      className="w-full rounded-lg border p-3"
+    >
+      <option>Наложен платеж</option>
+      <option>Speedy</option>
+      <option>Econt</option>
+      <option>Лично предаване</option>
+    </select>
 
 {deliveryMethod === "Econt" && (
-  <EcontDeliveryPicker />
+  <EcontDeliveryPicker
+    onChange={setEcontSelection}
+  />
 )}
-            <div className="mt-4 flex gap-3">
+            {deliveryMethod === "Econt" && econtSelection && (
+  <p className="mt-3 text-sm font-semibold text-green-700">
+    ✅ Vendora получи избора: {econtSelection.cityName} →{" "}
+    {econtSelection.officeName}
+  </p>
+)}
+ <div className="mt-4 flex gap-3">
   <button
     type="button"
     onClick={() =>
