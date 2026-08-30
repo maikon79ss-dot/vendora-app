@@ -1,5 +1,5 @@
 "use client";
-
+import EcontDeliveryPicker from "./components/EcontDeliveryPicker";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -25,7 +25,7 @@ type Product = {
 
 export default function Products() {
   const router = useRouter();
-
+const [deliveryMethod, setDeliveryMethod] = useState("Наложен платеж");
   const [products, setProducts] = useState<Product[]>([]);
   const [productType, setProductType] = useState("physical");
   const [category, setCategory] = useState("Без категория");
@@ -619,12 +619,20 @@ if (createdProductId !== undefined && createdProductId !== null) {
               Начин на доставка
             </label>
 
-            <select className="w-full rounded-lg border p-3">
-              <option>Наложен платеж</option>
-              <option>Speedy</option>
-              <option>Econt</option>
-              <option>Лично предаване</option>
-            </select>
+           <select
+  value={deliveryMethod}
+  onChange={(e) => setDeliveryMethod(e.target.value)}
+  className="w-full rounded-lg border p-3"
+>
+  <option>Наложен платеж</option>
+  <option>Speedy</option>
+  <option>Econt</option>
+  <option>Лично предаване</option>
+</select>
+
+{deliveryMethod === "Econt" && (
+  <EcontDeliveryPicker />
+)}
             <div className="mt-4 flex gap-3">
   <button
     type="button"
