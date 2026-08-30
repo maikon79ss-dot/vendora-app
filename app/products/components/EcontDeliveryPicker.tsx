@@ -16,8 +16,21 @@ type EcontOffice = {
     fullAddress?: string | null;
   };
 };
+export type EcontSelection = {
+  cityId: number;
+  cityName: string;
+  postCode?: string | null;
+  officeId: number;
+  officeName: string;
+  officeAddress?: string | null;
+};
 
-export default function EcontDeliveryPicker() {
+type EcontDeliveryPickerProps = {
+  onChange?: (selection: EcontSelection | null) => void;
+};
+export default function EcontDeliveryPicker({
+  onChange,
+}: EcontDeliveryPickerProps) {
   const [cities, setCities] = useState<EcontCity[]>([]);
   const [cityId, setCityId] = useState("");
   const [offices, setOffices] = useState<EcontOffice[]>([]);
@@ -81,7 +94,7 @@ const selectedOffice = offices.find(
     setOfficeId("");
     setOffices([]);
     setError("");
-
+onChange?.(null);
     if (!nextCityId) {
       return;
     }
@@ -116,7 +129,36 @@ const selectedOffice = offices.find(
       setLoadingOffices(false);
     }
   }
+function handleOfficeChange(nextOfficeId: string) {
+  setOfficeId(nextOfficeId);
 
+  if (!nextOfficeId) {
+    onChange?.(null);
+    return;
+  }
+
+  const city = cities.find(
+    (item) => String(item.id) === cityId
+  );
+
+  const office = offices.find(
+    (item) => String(item.id) === nextOfficeId
+  );
+
+  if (!city || !office) {
+    onChange?.(null);
+    return;
+  }
+
+  onChange?.({
+    cityId: city.id,
+    cityName: city.name,
+    postCode: city.postCode,
+    officeId: office.id,
+    officeName: office.name,
+    officeAddress: office.address?.fullAddress,
+  });
+}
   return (
     <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
       <p className="mb-4 font-semibold text-green-800">
@@ -153,7 +195,7 @@ const selectedOffice = offices.find(
 
       <select
         value={officeId}
-        onChange={(e) => setOfficeId(e.target.value)}
+        onChange={(e) => handleOfficeChange(e.target.value)}
         disabled={!cityId || loadingOffices}
         className="w-full rounded-lg border p-3"
       >
