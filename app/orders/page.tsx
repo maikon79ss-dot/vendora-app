@@ -11,6 +11,9 @@ type Order = {
   customer_name: string;
   customer_email?: string | null;
   customer_phone?: string | null;
+  address?: string | null;
+city?: string | null;
+postal_code?: string | null;
   quantity: number;
   total_price?: number | null;
   payment_method?: string | null;
@@ -77,6 +80,9 @@ export default function OrdersPage() {
         customer_name,
         customer_email,
         customer_phone,
+        address,
+city,
+postal_code,
         quantity,
         total_price,
               payment_method,
@@ -236,7 +242,37 @@ export default function OrdersPage() {
       className: "bg-gray-100 text-gray-700",
     };
   }
+function checkEcontShipment(order: Order) {
+  const isEcontOrder =
+    order.address?.startsWith("Econt офис:");
 
+  if (!isEcontOrder) {
+    alert("Тази поръчка не е за доставка до офис на Econt.");
+    return;
+  }
+
+  if (
+    !order.customer_name ||
+    !order.customer_phone ||
+    !order.city ||
+    !order.address
+  ) {
+    alert(
+      "Липсват данни, необходими за създаване на Econt пратка."
+    );
+    return;
+  }
+
+  alert(
+    `✅ Поръчката е готова за Econt.
+
+Клиент: ${order.customer_name}
+Телефон: ${order.customer_phone}
+Град: ${order.city}
+Доставка: ${order.address}
+Пощенски код: ${order.postal_code || "-"}`
+  );
+}
   if (loading) {
     return (
       <main className="min-h-screen bg-gray-100 p-10">
@@ -457,29 +493,39 @@ export default function OrdersPage() {
   )}
 </td>
 
-                        <td className="px-4 py-4">
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                router.push(
-                                  `/orders/${order.id}`
-                                )
-                              }
-                              className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white"
-                            >
-                              👁 Отвори
-                            </button>
+                     <td className="px-4 py-4">
+  <div className="flex gap-2">
+    <button
+      type="button"
+      onClick={() =>
+        router.push(
+          `/orders/${order.id}`
+        )
+      }
+      className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white"
+    >
+      👁 Отвори
+    </button>
 
-                            <button
-                              type="button"
-                              onClick={() => window.print()}
-                              className="rounded-lg border px-4 py-2 font-semibold"
-                            >
-                              🖨
-                            </button>
-                          </div>
-                        </td>
+    {order.address?.startsWith("Econt офис:") && (
+      <button
+        type="button"
+        onClick={() => checkEcontShipment(order)}
+        className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white"
+      >
+        📦 Econt
+      </button>
+    )}
+
+    <button
+      type="button"
+      onClick={() => window.print()}
+      className="rounded-lg border px-4 py-2 font-semibold"
+    >
+      🖨
+    </button>
+  </div>
+</td>
                       </tr>
                     );
                   })}
