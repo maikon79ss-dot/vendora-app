@@ -1256,26 +1256,30 @@ Vendora`
     {econtSelection.officeName}
   </p>
 )}
-            <input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Адрес"
-              className="mb-4 w-full rounded-lg border p-3"
-            />
+          {deliveryMethod === "Доставка до адрес" && (
+  <>
+    <input
+      value={address}
+      onChange={(e) => setAddress(e.target.value)}
+      placeholder="Адрес"
+      className="mb-4 w-full rounded-lg border p-3"
+    />
 
-            <input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Град"
-              className="mb-4 w-full rounded-lg border p-3"
-            />
+    <input
+      value={city}
+      onChange={(e) => setCity(e.target.value)}
+      placeholder="Град"
+      className="mb-4 w-full rounded-lg border p-3"
+    />
 
-            <input
-              value={postalCode}
-              onChange={(e) => setPostalCode(e.target.value)}
-              placeholder="Пощенски код"
-              className="mb-4 w-full rounded-lg border p-3"
-            />
+    <input
+      value={postalCode}
+      onChange={(e) => setPostalCode(e.target.value)}
+      placeholder="Пощенски код"
+      className="mb-4 w-full rounded-lg border p-3"
+    />
+  </>
+)} 
 
             <label className="mb-2 block font-semibold">
               Начин на плащане
