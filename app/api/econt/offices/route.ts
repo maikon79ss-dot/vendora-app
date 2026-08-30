@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const baseUrl = process.env.ECONT_API_URL;
     const username = process.env.ECONT_USERNAME;
@@ -16,6 +16,23 @@ export async function GET() {
           error: "Econt configuration is missing.",
         },
         { status: 500 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const cityIdParam = searchParams.get("cityId");
+
+    const cityID = cityIdParam
+      ? Number(cityIdParam)
+      : 41;
+
+    if (!Number.isInteger(cityID) || cityID <= 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Invalid city ID.",
+        },
+        { status: 400 }
       );
     }
 
@@ -36,22 +53,22 @@ export async function GET() {
       },
       body: JSON.stringify({
         countryCode: "BGR",
-        cityID: 41,
+        cityID,
       }),
       cache: "no-store",
     });
 
     const responseText = await response.text();
 
-   let data: Record<string, unknown>;
+    let data: Record<string, unknown>;
 
-try {
-  data = JSON.parse(responseText) as Record<string, unknown>;
-} catch {
-  data = {
-    rawResponse: responseText,
-  };
-}
+    try {
+      data = JSON.parse(responseText) as Record<string, unknown>;
+    } catch {
+      data = {
+        rawResponse: responseText,
+      };
+    }
 
     if (!response.ok) {
       return NextResponse.json(
@@ -64,15 +81,16 @@ try {
       );
     }
 
-   const offices = Array.isArray(data.offices)
-  ? data.offices
-  : [];
+    const offices = Array.isArray(data.offices)
+      ? data.offices
+      : [];
 
     return NextResponse.json({
       ok: true,
       message: "Econt Demo connection works.",
+      cityID,
       officeCount: offices.length,
-      offices: offices.slice(0, 10),
+      offices,
     });
   } catch (error) {
     console.error("Econt offices error:", error);
