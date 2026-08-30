@@ -26,7 +26,13 @@ export default function EcontDeliveryPicker() {
   const [loadingCities, setLoadingCities] = useState(true);
   const [loadingOffices, setLoadingOffices] = useState(false);
   const [error, setError] = useState("");
+const selectedCity = cities.find(
+  (city) => String(city.id) === cityId
+);
 
+const selectedOffice = offices.find(
+  (office) => String(office.id) === officeId
+);
   useEffect(() => {
     let isActive = true;
 
@@ -174,7 +180,32 @@ export default function EcontDeliveryPicker() {
           Намерени офиси: {offices.length}
         </p>
       )}
+{selectedCity && selectedOffice && (
+  <div className="mt-4 rounded-lg border border-green-300 bg-white p-4">
+    <p className="font-semibold text-green-800">
+      ✅ Избрана Econt доставка
+    </p>
 
+    <p className="mt-2 text-sm text-gray-700">
+      <strong>Населено място:</strong>{" "}
+      {selectedCity.name}
+      {selectedCity.postCode
+        ? ` (${selectedCity.postCode})`
+        : ""}
+    </p>
+
+    <p className="mt-2 text-sm text-gray-700">
+      <strong>Офис:</strong> {selectedOffice.name}
+    </p>
+
+    {selectedOffice.address?.fullAddress && (
+      <p className="mt-2 text-sm text-gray-600">
+        <strong>Адрес:</strong>{" "}
+        {selectedOffice.address.fullAddress}
+      </p>
+    )}
+  </div>
+)}
       {error && (
         <p className="mt-3 text-sm font-semibold text-red-600">
           {error}
