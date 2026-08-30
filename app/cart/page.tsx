@@ -29,6 +29,8 @@ export default function CartPage() {
 
 const [econtSelection, setEcontSelection] =
   useState<EcontSelection | null>(null);
+  const [econtEnabled, setEcontEnabled] =
+  useState(false);
 const [paymentMethod, setPaymentMethod] =
   useState("");
 
@@ -130,6 +132,7 @@ useEffect(() => {
   revolut_enabled,
   bank_transfer_enabled,
   cod_enabled,
+  econt_enabled,
   paypal_payment_link,
   revolut_payment_link,
   bank_account_holder,
@@ -147,14 +150,16 @@ useEffect(() => {
       return;
     }
 
-    setPaymentSettings({
-      stripe: data?.stripe_enabled ?? false,
-      paypal: data?.paypal_enabled ?? false,
-      revolut: data?.revolut_enabled ?? false,
-      bankTransfer:
-        data?.bank_transfer_enabled ?? false,
-      cod: data?.cod_enabled ?? true,
-    });
+  setPaymentSettings({
+  stripe: data?.stripe_enabled ?? false,
+  paypal: data?.paypal_enabled ?? false,
+  revolut: data?.revolut_enabled ?? false,
+  bankTransfer:
+    data?.bank_transfer_enabled ?? false,
+  cod: data?.cod_enabled ?? true,
+});
+
+setEcontEnabled(data?.econt_enabled ?? false);
 setPaymentLinks({
   paypal: data?.paypal_payment_link || "",
   revolut: data?.revolut_payment_link || "",
@@ -1272,7 +1277,9 @@ Vendora`
   className="mb-4 w-full rounded-lg border p-3"
 >
   <option>Доставка до адрес</option>
+  {econtEnabled && (
   <option>Econt офис</option>
+)}
 </select>
 
 {deliveryMethod === "Econt офис" && (
