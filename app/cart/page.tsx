@@ -487,10 +487,16 @@ const orderPostalCode =
       customer_name: customerName,
       customer_email: customerEmail,
       customer_phone: customerPhone,
-    address: orderAddress,
+ address: orderAddress,
 city: orderCity,
 postal_code: orderPostalCode,
-      quantity: item.quantity,
+
+econt_office_code:
+  deliveryMethod === "Econt офис" && econtSelection
+    ? econtSelection.officeCode || null
+    : null,
+
+quantity: item.quantity,
       variant: item.variant,
       payment_method: paymentMethod,
       total_price: Number(itemFinalPrice.toFixed(2)),
