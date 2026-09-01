@@ -21,6 +21,7 @@ export type EcontSelection = {
   cityName: string;
   postCode?: string | null;
   officeId: number;
+  officeCode?: string | null;
   officeName: string;
   officeAddress?: string | null;
 };
@@ -150,14 +151,15 @@ function handleOfficeChange(nextOfficeId: string) {
     return;
   }
 
-  onChange?.({
-    cityId: city.id,
-    cityName: city.name,
-    postCode: city.postCode,
-    officeId: office.id,
-    officeName: office.name,
-    officeAddress: office.address?.fullAddress,
-  });
+onChange?.({
+  cityId: city.id,
+  cityName: city.name,
+  postCode: city.postCode,
+  officeId: office.id,
+  officeCode: office.code || null,
+  officeName: office.name,
+  officeAddress: office.address?.fullAddress,
+});
 }
   return (
     <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
