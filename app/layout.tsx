@@ -33,15 +33,23 @@ description:
     follow: true,
   },
 
-  openGraph: {
-    type: "website",
-    locale: "bg_BG",
-    url: "https://www.vendora.trade",
-    siteName: "Vendora",
-    title: "Vendora – Създай онлайн магазин без програмиране",
-description:
-  "Създай онлайн магазин с Vendora без програмиране. Добавяй физически и дигитални продукти, приемай поръчки и управлявай магазина си лесно от едно място.",
-  },
+openGraph: {
+  type: "website",
+  locale: "bg_BG",
+  url: "https://www.vendora.trade",
+  siteName: "Vendora",
+  title: "Vendora – Създай онлайн магазин без програмиране",
+  description:
+    "Създай онлайн магазин с Vendora без програмиране. Добавяй физически и дигитални продукти, приемай поръчки и управлявай магазина си лесно от едно място.",
+  images: [
+    {
+      url: "/vendora-home-new.png",
+      width: 1536,
+      height: 1024,
+      alt: "Vendora – платформа за създаване на онлайн магазин",
+    },
+  ],
+},
 };
 export const viewport: Viewport = {
   width: "device-width",
