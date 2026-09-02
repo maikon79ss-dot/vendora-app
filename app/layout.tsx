@@ -15,7 +15,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.vendora.trade"),
-
+alternates: {
+  canonical: "https://www.vendora.trade/",
+},
   title: {
     default: "Vendora – Създай онлайн магазин без програмиране",
     template: "%s | Vendora",
