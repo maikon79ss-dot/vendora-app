@@ -53,6 +53,23 @@ const [codEnabled, setCodEnabled] =
   useState(true);
   const [econtEnabled, setEcontEnabled] =
   useState(false);
+  const [econtUsername, setEcontUsername] =
+  useState("");
+
+const [econtPassword, setEcontPassword] =
+  useState("");
+
+const [econtConnecting, setEcontConnecting] =
+  useState(false);
+
+const [econtConnected, setEcontConnected] =
+  useState(false);
+
+const [econtClientName, setEcontClientName] =
+  useState("");
+
+const [econtClientNumber, setEcontClientNumber] =
+  useState("");
   const [paypalPaymentLink, setPaypalPaymentLink] =
   useState("");
 
@@ -315,6 +332,37 @@ setBankTransferEnabled(
 
 setCodEnabled(data?.cod_enabled ?? true);
     setEcontEnabled(data?.econt_enabled ?? false);
+   const {
+  data: econtConnection,
+  error: econtConnectionError,
+} = await supabase
+  .from("econt_connections")
+  .select(
+    "is_connected, client_name, client_number"
+  )
+  .eq("user_id", session.user.id)
+  .maybeSingle();
+
+if (econtConnectionError) {
+  console.error(
+    "Econt connection load error:",
+    econtConnectionError
+  );
+}
+
+if (econtConnection) {
+  setEcontConnected(
+    econtConnection.is_connected === true
+  );
+
+  setEcontClientName(
+    econtConnection.client_name || ""
+  );
+
+  setEcontClientNumber(
+    econtConnection.client_number || ""
+  );
+} 
 setPaypalPaymentLink(
   data?.paypal_payment_link || ""
 );
@@ -545,7 +593,87 @@ setBankName(
 
     return data.publicUrl;
   }
+async function connectEcont() {
+  if (
+    !econtUsername.trim() ||
+    !econtPassword
+  ) {
+    setMessage(
+      "Въведете Econt потребителско име и парола."
+    );
+    return;
+  }
 
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    setMessage(
+      "Неуспешна проверка на потребителската сесия."
+    );
+    return;
+  }
+
+  setEcontConnecting(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/econt/connect",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          username: econtUsername.trim(),
+          password: econtPassword,
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      setMessage(
+        result.error ||
+          "Econt акаунтът не можа да бъде свързан."
+      );
+      return;
+    }
+
+    setEcontConnected(true);
+
+    setEcontClientName(
+      result.connection?.clientName || ""
+    );
+
+    setEcontClientNumber(
+      result.connection?.clientNumber || ""
+    );
+
+    setEcontPassword("");
+
+    setMessage(
+      "✅ Econt акаунтът е свързан успешно."
+    );
+  } catch (error) {
+    console.error(
+      "Econt connect error:",
+      error
+    );
+
+    setMessage(
+      "Възникна грешка при свързването с Econt."
+    );
+  } finally {
+    setEcontConnecting(false);
+  }
+}
   async function saveSettings() {
     if (!userId) {
       setMessage(
@@ -788,14 +916,86 @@ if (loading) {
   </h2>
 
   <p className="mt-2 text-gray-600">
-    Разрешете на клиентите да избират офис на Econt при поръчка.
+    Свържете своя Econt акаунт и разрешете на клиентите
+    да избират офис на Econt при поръчка.
   </p>
 
-  <label className="mt-5 flex items-center gap-3">
+  <div
+    className={`mt-5 rounded-xl p-4 ${
+      econtConnected
+        ? "bg-green-50 text-green-800"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {econtConnected ? (
+      <>
+        <p className="font-bold">
+          ✅ Econt акаунтът е свързан
+        </p>
+
+        {econtClientName && (
+          <p className="mt-2 text-sm">
+            Клиент: {econtClientName}
+          </p>
+        )}
+
+        {econtClientNumber && (
+          <p className="mt-1 text-sm">
+            Клиентски номер: {econtClientNumber}
+          </p>
+        )}
+      </>
+    ) : (
+      <p className="font-semibold">
+        Econt акаунтът все още не е свързан.
+      </p>
+    )}
+  </div>
+
+  <div className="mt-5 space-y-3">
+    <input
+      type="text"
+      value={econtUsername}
+      onChange={(e) =>
+        setEcontUsername(e.target.value)
+      }
+      placeholder="Econt потребителско име"
+      autoComplete="username"
+      className="w-full rounded-lg border p-3"
+    />
+
+    <input
+      type="password"
+      value={econtPassword}
+      onChange={(e) =>
+        setEcontPassword(e.target.value)
+      }
+      placeholder="Econt парола"
+      autoComplete="current-password"
+      className="w-full rounded-lg border p-3"
+    />
+
+    <button
+      type="button"
+      onClick={connectEcont}
+      disabled={econtConnecting}
+      className="rounded-lg bg-green-600 px-5 py-3 font-semibold text-white disabled:opacity-50"
+    >
+      {econtConnecting
+        ? "Свързване..."
+        : econtConnected
+          ? "Обнови Econt връзката"
+          : "Свържи Econt"}
+    </button>
+  </div>
+
+  <label className="mt-6 flex items-center gap-3">
     <input
       type="checkbox"
       checked={econtEnabled}
-      onChange={(e) => setEcontEnabled(e.target.checked)}
+      onChange={(e) =>
+        setEcontEnabled(e.target.checked)
+      }
       className="h-5 w-5"
     />
 
