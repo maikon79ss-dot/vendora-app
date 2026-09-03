@@ -19,6 +19,10 @@ import type {
 type EcontSenderAddress = {
   id: number | null;
   fullAddress: string;
+  quarter?: string;
+  street?: string;
+  num?: string;
+  other?: string;
   city: {
     id: number | null;
     name: string;
@@ -1204,10 +1208,32 @@ if (loading) {
                 key={address.id}
                 value={String(address.id)}
               >
-                {address.fullAddress ||
-                  `${address.city.name} ${
-                    address.city.postCode || ""
-                  }`}
+  {address.street ||
+address.quarter ||
+address.num ||
+address.other
+  ? [
+      [address.city.name, address.city.postCode]
+        .filter(Boolean)
+        .join(" "),
+      address.quarter
+        ? `кв. ${address.quarter}`
+        : "",
+      address.street
+        ? `ул. ${address.street}${
+            address.num
+              ? ` ${address.num}`
+              : ""
+          }`
+        : "",
+      address.other || "",
+    ]
+      .filter(Boolean)
+      .join(", ")
+  : address.fullAddress ||
+    [address.city.name, address.city.postCode]
+      .filter(Boolean)
+      .join(" ")}
               </option>
             ) : null
           )}
