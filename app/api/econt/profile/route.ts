@@ -80,9 +80,9 @@ export async function GET(request: Request) {
       error: connectionError,
     } = await supabaseAdmin
       .from("econt_connections")
-      .select(
-        "client_id, client_name, client_number, is_connected"
-      )
+    .select(
+  "client_id, client_name, client_number, is_connected, sender_address_id"
+)
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -259,22 +259,25 @@ export async function GET(request: Request) {
       })
     );
 
-    return NextResponse.json({
-      ok: true,
-      profile: {
-        clientId:
-          selectedProfile.client.id || null,
+  return NextResponse.json({
+  ok: true,
+  profile: {
+    clientId:
+      selectedProfile.client.id || null,
 
-        clientName:
-          selectedProfile.client.name || "",
+    clientName:
+      selectedProfile.client.name || "",
 
-        clientNumber:
-          selectedProfile.client.clientNumber ||
-          "",
+    clientNumber:
+      selectedProfile.client.clientNumber ||
+      "",
 
-        addresses: safeAddresses,
-      },
-    });
+    senderAddressId:
+      connection.sender_address_id || null,
+
+    addresses: safeAddresses,
+  },
+});
   } catch (error) {
     console.error(
       "Econt profile route error:",
