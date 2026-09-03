@@ -16,8 +16,9 @@ type Order = {
   customer_phone: string;
   address: string;
   city: string;
-  postal_code: string;
-  quantity: number;
+ postal_code: string;
+econt_office_code?: string | null;
+quantity: number;
   variant: string;
   payment_method: string;
   total_price: number;
@@ -32,6 +33,14 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
 const [searchTerm, setSearchTerm] = useState("");
 const [statusFilter, setStatusFilter] = useState("Всички");
+  const [econtWeights, setEcontWeights] =
+  useState<Record<string, string>>({});
+
+const [econtPackCounts, setEcontPackCounts] =
+  useState<Record<string, string>>({});
+
+const [econtValidating, setEcontValidating] =
+  useState<Record<string, boolean>>({});
 const groupedOrders: Order[][] = Object.values(
   orders.reduce<Record<string, Order[]>>((groups, order) => {
     const groupKey = order.checkout_id || String(order.id);
@@ -235,34 +244,192 @@ Vendora`,
     alert("❌ Неуспешно копиране.");
   }
 }
- function checkEcontShipment(order: Order) {
-  if (!order.address?.startsWith("Econt офис:")) {
-    alert("Тази поръчка не е за доставка до офис на Econt.");
-    return;
-  }
+async function validateEcontShipment(
+  orderGroup: Order[]
+) {
+  const firstOrder = orderGroup[0];
 
-  if (
-    !order.customer_name ||
-    !order.customer_phone ||
-    !order.city ||
-    !order.address
-  ) {
+  if (!firstOrder) return;
+
+  const orderKey =
+    firstOrder.checkout_id ||
+    String(firstOrder.id);
+
+  if (!firstOrder.checkout_id) {
     alert(
-      "Липсват данни, необходими за създаване на Econt пратка."
+      "Липсва номер на поръчката за Econt проверка."
     );
     return;
   }
 
-  alert(
-    `✅ Поръчката е готова за Econt.
+  if (
+    !firstOrder.address?.startsWith(
+      "Econt офис:"
+    )
+  ) {
+    alert(
+      "Тази поръчка не е за доставка до офис на Econt."
+    );
+    return;
+  }
 
-Клиент: ${order.customer_name}
-Телефон: ${order.customer_phone}
-Град: ${order.city}
-Доставка: ${order.address}
-Пощенски код: ${order.postal_code || "-"}`
+  if (!firstOrder.econt_office_code) {
+    alert(
+      "Липсва Econt код на офиса на получателя."
+    );
+    return;
+  }
+
+  const weightText =
+    econtWeights[orderKey]?.trim() || "";
+
+  const weight = Number(
+    weightText.replace(",", ".")
   );
-} 
+
+  const packCount = Number(
+    econtPackCounts[orderKey] || "1"
+  );
+
+  if (
+    !Number.isFinite(weight) ||
+    weight <= 0
+  ) {
+    alert(
+      "Въведете валидно тегло на пратката."
+    );
+    return;
+  }
+
+  if (
+    !Number.isInteger(packCount) ||
+    packCount <= 0
+  ) {
+    alert(
+      "Броят пакети трябва да бъде положително цяло число."
+    );
+    return;
+  }
+
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    alert(
+      "Неуспешна проверка на потребителската сесия."
+    );
+    return;
+  }
+
+  setEcontValidating((current) => ({
+    ...current,
+    [orderKey]: true,
+  }));
+
+  try {
+    const response = await fetch(
+      "/api/econt/validate-shipment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          checkoutId:
+            firstOrder.checkout_id,
+          weight,
+          packCount,
+        }),
+      }
+    );
+
+    let result: any = null;
+
+    try {
+      result = await response.json();
+    } catch {
+      result = null;
+    }
+
+    if (
+      !response.ok ||
+      !result?.ok
+    ) {
+      alert(
+        result?.error ||
+          "Econt пратката не можа да бъде проверена."
+      );
+      return;
+    }
+
+    const validation =
+      result.validation || {};
+
+    const messageLines = [
+      "✅ Econt прие данните за пратката.",
+      "",
+      `Тегло: ${validation.weight ?? weight} кг`,
+      `Брой пакети: ${
+        validation.packCount ?? packCount
+      }`,
+      `Econt офис: ${
+        validation.receiverOfficeCode ||
+        firstOrder.econt_office_code
+      }`,
+    ];
+
+    if (
+      validation.totalPrice !== null &&
+      validation.totalPrice !== undefined
+    ) {
+      messageLines.push(
+        `Цена за доставка: ${validation.totalPrice} ${
+          validation.currency || ""
+        }`
+      );
+    }
+
+    if (validation.expectedDeliveryDate) {
+      messageLines.push(
+        `Очаквана доставка: ${validation.expectedDeliveryDate}`
+      );
+    }
+
+    if (validation.warnings) {
+      messageLines.push(
+        `Предупреждение: ${
+          typeof validation.warnings ===
+          "string"
+            ? validation.warnings
+            : JSON.stringify(
+                validation.warnings
+              )
+        }`
+      );
+    }
+
+    alert(messageLines.join("\n"));
+  } catch (error) {
+    console.error(
+      "Econt validation error:",
+      error
+    );
+
+    alert(
+      "Възникна грешка при проверката на Econt пратката."
+    );
+  } finally {
+    setEcontValidating((current) => ({
+      ...current,
+      [orderKey]: false,
+    }));
+  }
+}
 function generateOrderPDF(orderGroup: Order[]) {
   const firstOrder = orderGroup[0];
 
@@ -450,7 +617,9 @@ function generateOrderPDF(orderGroup: Order[]) {
       (total, order) => total + order.quantity,
       0
     );
-
+const orderKey =
+  firstOrder.checkout_id ||
+  String(firstOrder.id);
     return (
       <div
         key={firstOrder.checkout_id || String(firstOrder.id)}
@@ -499,15 +668,88 @@ function generateOrderPDF(orderGroup: Order[]) {
   >
     📋 Копирай адрес
   </button>
-  {firstOrder.address?.startsWith("Econt офис:") && (
-  <button
-    type="button"
-    onClick={() => checkEcontShipment(firstOrder)}
-    className="ml-2 mt-2 rounded-lg bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700"
-  >
-    📦 Econt
-  </button>
-)}            
+ {firstOrder.address?.startsWith(
+  "Econt офис:"
+) && (
+  <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
+    <p className="font-bold text-green-800">
+      📦 Econt проверка на пратката
+    </p>
+
+    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <label className="text-sm font-semibold">
+        Тегло (кг)
+
+        <input
+          type="text"
+          inputMode="decimal"
+          value={
+            econtWeights[orderKey] || ""
+          }
+          onChange={(e) =>
+            setEcontWeights(
+              (current) => ({
+                ...current,
+                [orderKey]:
+                  e.target.value,
+              })
+            )
+          }
+          placeholder="Напр. 1.5"
+          className="mt-1 w-full rounded-lg border bg-white p-2"
+        />
+      </label>
+
+      <label className="text-sm font-semibold">
+        Брой пакети
+
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value={
+            econtPackCounts[
+              orderKey
+            ] || "1"
+          }
+          onChange={(e) =>
+            setEcontPackCounts(
+              (current) => ({
+                ...current,
+                [orderKey]:
+                  e.target.value,
+              })
+            )
+          }
+          className="mt-1 w-full rounded-lg border bg-white p-2"
+        />
+      </label>
+    </div>
+
+    <button
+      type="button"
+      onClick={() =>
+        void validateEcontShipment(
+          orderGroup
+        )
+      }
+      disabled={
+        econtValidating[orderKey] ===
+        true
+      }
+      className="mt-3 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+    >
+      {econtValidating[orderKey]
+        ? "Проверяване..."
+        : "📦 Провери пратката"}
+    </button>
+
+    <p className="mt-2 text-xs text-green-800">
+      Тази проверка не създава
+      товарителница.
+    </p>
+  </div>
+)}          
 </div>
 
             <p className="mt-3 text-sm text-gray-500">
