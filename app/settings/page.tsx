@@ -16,7 +16,15 @@ import type {
   BannerTextColor,
   BannerTextPosition,
 } from "@/components/settings/types";
-
+type EcontSenderAddress = {
+  id: number | null;
+  fullAddress: string;
+  city: {
+    id: number | null;
+    name: string;
+    postCode: string;
+  };
+};
 export default function SettingsPage() {
   const router = useRouter();
 
@@ -67,7 +75,23 @@ const [econtConnected, setEcontConnected] =
 
 const [econtClientName, setEcontClientName] =
   useState("");
+const [econtAddresses, setEcontAddresses] =
+  useState<EcontSenderAddress[]>([]);
 
+const [
+  econtSenderAddressId,
+  setEcontSenderAddressId,
+] = useState("");
+
+const [
+  econtAddressLoading,
+  setEcontAddressLoading,
+] = useState(false);
+
+const [
+  econtAddressSaving,
+  setEcontAddressSaving,
+] = useState(false);
 const [econtClientNumber, setEcontClientNumber] =
   useState("");
   const [paypalPaymentLink, setPaypalPaymentLink] =
@@ -362,7 +386,13 @@ if (econtConnection) {
   setEcontClientNumber(
     econtConnection.client_number || ""
   );
-} 
+
+  if (econtConnection.is_connected) {
+    await loadEcontProfile(
+      session.access_token
+    );
+  }
+}
 setPaypalPaymentLink(
   data?.paypal_payment_link || ""
 );
@@ -593,6 +623,154 @@ setBankName(
 
     return data.publicUrl;
   }
+  async function loadEcontProfile(
+  accessToken?: string
+) {
+  setEcontAddressLoading(true);
+
+  try {
+    let token = accessToken;
+
+    if (!token) {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        setMessage(
+          "Неуспешна проверка на потребителската сесия."
+        );
+        return;
+      }
+
+      token = session.access_token;
+    }
+
+    const response = await fetch(
+      "/api/econt/profile",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      setMessage(
+        result.error ||
+          "Econt профилът не можа да бъде зареден."
+      );
+      return;
+    }
+
+    const addresses = Array.isArray(
+      result.profile?.addresses
+    )
+      ? result.profile.addresses
+      : [];
+
+    setEcontAddresses(addresses);
+
+    setEcontSenderAddressId(
+      result.profile?.senderAddressId
+        ? String(result.profile.senderAddressId)
+        : ""
+    );
+
+    setEcontClientName(
+      result.profile?.clientName || ""
+    );
+
+    setEcontClientNumber(
+      result.profile?.clientNumber || ""
+    );
+
+    setEcontConnected(true);
+  } catch (error) {
+    console.error(
+      "Econt profile load error:",
+      error
+    );
+
+    setMessage(
+      "Възникна грешка при зареждането на Econt адресите."
+    );
+  } finally {
+    setEcontAddressLoading(false);
+  }
+}
+
+async function saveEcontSenderAddress() {
+  if (!econtSenderAddressId) {
+    setMessage(
+      "Изберете адрес на подателя."
+    );
+    return;
+  }
+
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    setMessage(
+      "Неуспешна проверка на потребителската сесия."
+    );
+    return;
+  }
+
+  setEcontAddressSaving(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/econt/sender-address",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          senderAddressId:
+            Number(econtSenderAddressId),
+        }),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      setMessage(
+        result.error ||
+          "Адресът на подателя не можа да бъде запазен."
+      );
+      return;
+    }
+
+    setMessage(
+      "✅ Econt адресът на подателя е запазен."
+    );
+  } catch (error) {
+    console.error(
+      "Econt sender address save error:",
+      error
+    );
+
+    setMessage(
+      "Възникна грешка при записването на Econt адреса."
+    );
+  } finally {
+    setEcontAddressSaving(false);
+  }
+}
 async function connectEcont() {
   if (
     !econtUsername.trim() ||
@@ -655,7 +833,9 @@ async function connectEcont() {
     setEcontClientNumber(
       result.connection?.clientNumber || ""
     );
-
+await loadEcontProfile(
+  session.access_token
+);
     setEcontPassword("");
 
     setMessage(
@@ -988,7 +1168,72 @@ if (loading) {
           : "Свържи Econt"}
     </button>
   </div>
+{econtConnected && (
+  <div className="mt-6 rounded-xl border p-4">
+    <label className="block font-semibold">
+      Адрес на подателя
+    </label>
 
+    <p className="mt-1 text-sm text-gray-600">
+      Изберете адреса, от който ще изпращате
+      пратките с Econt.
+    </p>
+
+    {econtAddressLoading ? (
+      <p className="mt-4 text-sm text-gray-600">
+        Зареждане на Econt адресите...
+      </p>
+    ) : econtAddresses.length > 0 ? (
+      <>
+        <select
+          value={econtSenderAddressId}
+          onChange={(e) =>
+            setEcontSenderAddressId(
+              e.target.value
+            )
+          }
+          className="mt-4 w-full rounded-lg border p-3"
+        >
+          <option value="">
+            Изберете адрес
+          </option>
+
+          {econtAddresses.map((address) =>
+            address.id !== null ? (
+              <option
+                key={address.id}
+                value={String(address.id)}
+              >
+                {address.fullAddress ||
+                  `${address.city.name} ${
+                    address.city.postCode || ""
+                  }`}
+              </option>
+            ) : null
+          )}
+        </select>
+
+        <button
+          type="button"
+          onClick={saveEcontSenderAddress}
+          disabled={
+            econtAddressSaving ||
+            !econtSenderAddressId
+          }
+          className="mt-3 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white disabled:opacity-50"
+        >
+          {econtAddressSaving
+            ? "Запазване..."
+            : "Запази адреса"}
+        </button>
+      </>
+    ) : (
+      <p className="mt-4 text-sm font-semibold text-gray-600">
+        Няма намерени адреси в Econt профила.
+      </p>
+    )}
+  </div>
+)}
   <label className="mt-6 flex items-center gap-3">
     <input
       type="checkbox"
