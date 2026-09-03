@@ -29,6 +29,12 @@ type EcontSenderAddress = {
     postCode: string;
   };
 };
+type EcontCodPayOption = {
+  key: string;
+  method: string;
+  label: string;
+  moneyTransfer: boolean;
+};
 export default function SettingsPage() {
   const router = useRouter();
 
@@ -81,7 +87,20 @@ const [econtClientName, setEcontClientName] =
   useState("");
 const [econtAddresses, setEcontAddresses] =
   useState<EcontSenderAddress[]>([]);
+const [
+  econtCodPayOptions,
+  setEcontCodPayOptions,
+] = useState<EcontCodPayOption[]>([]);
 
+const [
+  econtCodPayOptionKey,
+  setEcontCodPayOptionKey,
+] = useState("");
+
+const [
+  econtCodSaving,
+  setEcontCodSaving,
+] = useState(false);
 const [
   econtSenderAddressId,
   setEcontSenderAddressId,
@@ -685,7 +704,23 @@ setBankName(
         ? String(result.profile.senderAddressId)
         : ""
     );
+const codPayOptions = Array.isArray(
+  result.profile?.codPayOptions
+)
+  ? result.profile.codPayOptions
+  : [];
 
+setEcontCodPayOptions(
+  codPayOptions
+);
+
+setEcontCodPayOptionKey(
+  result.profile?.codPayOptionKey
+    ? String(
+        result.profile.codPayOptionKey
+      )
+    : ""
+);
     setEcontClientName(
       result.profile?.clientName || ""
     );
@@ -773,6 +808,74 @@ async function saveEcontSenderAddress() {
     );
   } finally {
     setEcontAddressSaving(false);
+  }
+}
+  async function saveEcontCodPayOption() {
+  if (!econtCodPayOptionKey) {
+    setMessage(
+      "Изберете начин за изплащане на наложения платеж."
+    );
+    return;
+  }
+
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    setMessage(
+      "Неуспешна проверка на потребителската сесия."
+    );
+    return;
+  }
+
+  setEcontCodSaving(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      "/api/econt/cod-payment-option",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          codPayOptionKey:
+            econtCodPayOptionKey,
+        }),
+      }
+    );
+
+    const result =
+      await response.json();
+
+    if (!response.ok || !result.ok) {
+      setMessage(
+        result.error ||
+          "Начинът за изплащане не можа да бъде запазен."
+      );
+      return;
+    }
+
+    setMessage(
+      "✅ Начинът за изплащане на наложения платеж е запазен."
+    );
+  } catch (error) {
+    console.error(
+      "Econt COD option save error:",
+      error
+    );
+
+    setMessage(
+      "Възникна грешка при записването на Econt начина за изплащане."
+    );
+  } finally {
+    setEcontCodSaving(false);
   }
 }
 async function connectEcont() {
@@ -1260,7 +1363,72 @@ address.other
     )}
   </div>
 )}
-  <label className="mt-6 flex items-center gap-3">
+
+{econtConnected && (
+  <div className="mt-6 rounded-xl border p-4">
+    <label className="block font-semibold">
+      Изплащане на наложен платеж
+    </label>
+
+    <p className="mt-1 text-sm text-gray-600">
+      Изберете как Econt да ви изплаща
+      сумите от наложен платеж.
+    </p>
+
+    {econtAddressLoading ? (
+      <p className="mt-4 text-sm text-gray-600">
+        Зареждане на Econt данните...
+      </p>
+    ) : econtCodPayOptions.length > 0 ? (
+      <>
+        <select
+          value={econtCodPayOptionKey}
+          onChange={(e) =>
+            setEcontCodPayOptionKey(
+              e.target.value
+            )
+          }
+          className="mt-4 w-full rounded-lg border p-3"
+        >
+          <option value="">
+            Изберете начин за изплащане
+          </option>
+
+          {econtCodPayOptions.map(
+            (option) => (
+              <option
+                key={option.key}
+                value={option.key}
+              >
+                {option.label}
+              </option>
+            )
+          )}
+        </select>
+
+        <button
+          type="button"
+          onClick={saveEcontCodPayOption}
+          disabled={
+            econtCodSaving ||
+            !econtCodPayOptionKey
+          }
+          className="mt-3 rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white disabled:opacity-50"
+        >
+          {econtCodSaving
+            ? "Запазване..."
+            : "Запази начина за изплащане"}
+        </button>
+      </>
+    ) : (
+      <p className="mt-4 text-sm font-semibold text-gray-600">
+        Няма намерени начини за изплащане
+        в Econt профила.
+      </p>
+    )}
+  </div>
+)}
+    <label className="mt-6 flex items-center gap-3">
     <input
       type="checkbox"
       checked={econtEnabled}
@@ -1269,7 +1437,6 @@ address.other
       }
       className="h-5 w-5"
     />
-
     <span className="font-semibold">
       Разреши Econt за моя магазин
     </span>
