@@ -85,24 +85,12 @@ const offices = Array.isArray(data.offices)
   ? data.offices
   : [];
 
-const packOffices = offices.filter(
-  (office: any) =>
-    Array.isArray(office?.shipmentTypes) &&
-    office.shipmentTypes.some(
-      (shipmentType: any) =>
-        String(shipmentType)
-          .toLowerCase()
-          .trim() === "pack"
-    )
-);
-
 return NextResponse.json({
   ok: true,
-  message:
-    "Econt offices for pack shipments loaded.",
+  message: "Econt Demo connection works.",
   cityID,
-  officeCount: packOffices.length,
-  offices: packOffices,
+  officeCount: offices.length,
+  offices,
 });
   } catch (error) {
     console.error("Econt offices error:", error);
