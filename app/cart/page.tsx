@@ -1290,6 +1290,7 @@ Vendora`
 
 {deliveryMethod === "Econt офис" && (
   <EcontDeliveryPicker
+    ownerId={cartItems[0]?.ownerId}
     onChange={setEcontSelection}
   />
 )}
