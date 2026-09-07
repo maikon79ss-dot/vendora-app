@@ -230,23 +230,10 @@ export async function GET(request: Request) {
         ? data.offices
         : [];
 
-    const packOffices =
-      offices.filter(
-        (office: any) =>
-          Array.isArray(
-            office?.shipmentTypes
-          ) &&
-          office.shipmentTypes.some(
-            (shipmentType: any) =>
-              String(shipmentType)
-                .trim()
-                .toLowerCase() ===
-              "pack"
-          )
-      );
+   
 
-    const simplifiedOffices =
-      packOffices.map(
+  const simplifiedOffices =
+  offices.map(
         (office: any) => ({
           id: office?.id,
           code: office?.code || null,
