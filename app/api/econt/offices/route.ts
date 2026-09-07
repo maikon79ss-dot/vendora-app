@@ -81,17 +81,29 @@ export async function GET(request: Request) {
       );
     }
 
-    const offices = Array.isArray(data.offices)
-      ? data.offices
-      : [];
+const offices = Array.isArray(data.offices)
+  ? data.offices
+  : [];
 
-    return NextResponse.json({
-      ok: true,
-      message: "Econt Demo connection works.",
-      cityID,
-      officeCount: offices.length,
-      offices,
-    });
+const packOffices = offices.filter(
+  (office: any) =>
+    Array.isArray(office?.shipmentTypes) &&
+    office.shipmentTypes.some(
+      (shipmentType: any) =>
+        String(shipmentType)
+          .toLowerCase()
+          .trim() === "pack"
+    )
+);
+
+return NextResponse.json({
+  ok: true,
+  message:
+    "Econt offices for pack shipments loaded.",
+  cityID,
+  officeCount: packOffices.length,
+  offices: packOffices,
+});
   } catch (error) {
     console.error("Econt offices error:", error);
 
