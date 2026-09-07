@@ -18,6 +18,7 @@ type Order = {
   city: string;
  postal_code: string;
 econt_office_code?: string | null;
+  tracking_number?: string | null;
 quantity: number;
   variant: string;
   payment_method: string;
@@ -40,6 +41,8 @@ const [econtPackCounts, setEcontPackCounts] =
   useState<Record<string, string>>({});
 
 const [econtValidating, setEcontValidating] =
+  useState<Record<string, boolean>>({});
+  const [econtCreating, setEcontCreating] =
   useState<Record<string, boolean>>({});
 const groupedOrders: Order[][] = Object.values(
   orders.reduce<Record<string, Order[]>>((groups, order) => {
@@ -430,6 +433,188 @@ async function validateEcontShipment(
     }));
   }
 }
+  async function createEcontShipment(
+  orderGroup: Order[]
+) {
+  const firstOrder = orderGroup[0];
+
+  if (!firstOrder) return;
+
+  const orderKey =
+    firstOrder.checkout_id ||
+    String(firstOrder.id);
+
+  if (!firstOrder.checkout_id) {
+    alert(
+      "Липсва номер на поръчката за Econt товарителница."
+    );
+    return;
+  }
+
+  if (
+    !firstOrder.address?.startsWith(
+      "Econt офис:"
+    )
+  ) {
+    alert(
+      "Тази поръчка не е за доставка до офис на Econt."
+    );
+    return;
+  }
+
+  if (!firstOrder.econt_office_code) {
+    alert(
+      "Липсва Econt код на офиса на получателя."
+    );
+    return;
+  }
+
+  const weightText =
+    econtWeights[orderKey]?.trim() || "";
+
+  const weight = Number(
+    weightText.replace(",", ".")
+  );
+
+  const packCount = Number(
+    econtPackCounts[orderKey] || "1"
+  );
+
+  if (
+    !Number.isFinite(weight) ||
+    weight <= 0
+  ) {
+    alert(
+      "Въведете валидно тегло на пратката."
+    );
+    return;
+  }
+
+  if (
+    !Number.isInteger(packCount) ||
+    packCount <= 0
+  ) {
+    alert(
+      "Броят пакети трябва да бъде положително цяло число."
+    );
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Това ще създаде реална Econt товарителница. Продължавате ли?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession();
+
+  if (sessionError || !session) {
+    alert(
+      "Неуспешна проверка на потребителската сесия."
+    );
+    return;
+  }
+
+  setEcontCreating((current) => ({
+    ...current,
+    [orderKey]: true,
+  }));
+
+  try {
+    const response = await fetch(
+      "/api/econt/create-shipment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          checkoutId:
+            firstOrder.checkout_id,
+          weight,
+          packCount,
+        }),
+      }
+    );
+
+    let result: any = null;
+
+    try {
+      result = await response.json();
+    } catch {
+      result = null;
+    }
+
+    if (
+      !response.ok ||
+      !result?.ok
+    ) {
+      alert(
+        result?.error ||
+          "Econt товарителницата не можа да бъде създадена."
+      );
+      return;
+    }
+
+    const shipment =
+      result.shipment || {};
+
+    const messageLines = [
+      result.alreadyCreated
+        ? "ℹ️ За тази поръчка вече има Econt товарителница."
+        : "✅ Econt товарителницата е създадена успешно.",
+      "",
+      `Номер: ${
+        shipment.shipmentNumber ||
+        "Няма върнат номер"
+      }`,
+    ];
+
+    if (
+      shipment.totalPrice !== null &&
+      shipment.totalPrice !== undefined
+    ) {
+      messageLines.push(
+        `Цена за доставка: ${shipment.totalPrice} ${
+          shipment.currency || ""
+        }`
+      );
+    }
+
+    if (result.warning) {
+      messageLines.push(
+        "",
+        `Предупреждение: ${result.warning}`
+      );
+    }
+
+    await loadOrders();
+
+    alert(messageLines.join("\n"));
+  } catch (error) {
+    console.error(
+      "Econt shipment creation error:",
+      error
+    );
+
+    alert(
+      "Възникна грешка при създаването на Econt товарителницата."
+    );
+  } finally {
+    setEcontCreating((current) => ({
+      ...current,
+      [orderKey]: false,
+    }));
+  }
+}
 function generateOrderPDF(orderGroup: Order[]) {
   const firstOrder = orderGroup[0];
 
@@ -748,6 +933,38 @@ const orderKey =
       Тази проверка не създава
       товарителница.
     </p>
+    {firstOrder.tracking_number && (
+  <p className="mt-3 text-sm font-semibold text-green-900">
+    ✅ Товарителница:{" "}
+    {firstOrder.tracking_number}
+  </p>
+)}
+
+<button
+  type="button"
+  onClick={() =>
+    void createEcontShipment(
+      orderGroup
+    )
+  }
+  disabled={
+    econtCreating[orderKey] === true ||
+    econtValidating[orderKey] === true ||
+    Boolean(firstOrder.tracking_number)
+  }
+  className="mt-3 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
+>
+  {firstOrder.tracking_number
+    ? "✅ Товарителницата е създадена"
+    : econtCreating[orderKey]
+    ? "Създаване..."
+    : "📦 Създай товарителница"}
+</button>
+
+<p className="mt-2 text-xs font-semibold text-red-700">
+  Този бутон създава реална Econt
+  товарителница.
+</p>
   </div>
 )}          
 </div>
