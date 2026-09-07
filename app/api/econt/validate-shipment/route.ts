@@ -627,6 +627,10 @@ if (hasCashOnDelivery) {
 
 orderNumber: checkoutId,
 
+paymentReceiverMethod: "cash",
+paymentReceiverAmount: 100,
+paymentReceiverAmountIsPercent: true,
+
 ...(shipmentServices
   ? { services: shipmentServices }
   : {}),
