@@ -27,9 +27,12 @@ export type EcontSelection = {
 };
 
 type EcontDeliveryPickerProps = {
+  ownerId?: string;
   onChange?: (selection: EcontSelection | null) => void;
 };
+
 export default function EcontDeliveryPicker({
+  ownerId,
   onChange,
 }: EcontDeliveryPickerProps) {
   const [cities, setCities] = useState<EcontCity[]>([]);
@@ -54,9 +57,15 @@ const selectedOffice = offices.find(
       try {
         setError("");
 
-        const response = await fetch("/api/econt/cities", {
-          cache: "no-store",
-        });
+      const citiesUrl = ownerId
+  ? `/api/econt/public/cities?ownerId=${encodeURIComponent(
+      ownerId
+    )}`
+  : "/api/econt/cities";
+
+const response = await fetch(citiesUrl, {
+  cache: "no-store",
+});
 
         const data = (await response.json()) as {
           ok?: boolean;
@@ -88,7 +97,7 @@ const selectedOffice = offices.find(
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [ownerId]);
 
   async function handleCityChange(nextCityId: string) {
     setCityId(nextCityId);
@@ -102,15 +111,17 @@ onChange?.(null);
 
     try {
       setLoadingOffices(true);
+const officesUrl = ownerId
+  ? `/api/econt/public/offices?ownerId=${encodeURIComponent(
+      ownerId
+    )}&cityId=${encodeURIComponent(nextCityId)}`
+  : `/api/econt/offices?cityId=${encodeURIComponent(
+      nextCityId
+    )}`;
 
-      const response = await fetch(
-        `/api/econt/offices?cityId=${encodeURIComponent(
-          nextCityId
-        )}`,
-        {
-          cache: "no-store",
-        }
-      );
+const response = await fetch(officesUrl, {
+  cache: "no-store",
+});
 
       const data = (await response.json()) as {
         ok?: boolean;
@@ -256,10 +267,7 @@ onChange?.({
         </p>
       )}
 
-      <p className="mt-3 text-xs text-gray-500">
-        Тестов режим — избраният град и офис все още не се
-        записват към продукта или поръчката.
-      </p>
+      
     </div>
   );
 }
