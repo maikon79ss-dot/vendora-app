@@ -1,8 +1,41 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-
+import { createHash } from "crypto";
 export const runtime = "nodejs";
+function canonicalize(value: any): any {
+  if (Array.isArray(value)) {
+    return value.map(canonicalize);
+  }
 
+  if (
+    value &&
+    typeof value === "object"
+  ) {
+    const result: Record<string, any> = {};
+
+    for (const key of Object.keys(value).sort()) {
+      result[key] = canonicalize(
+        value[key]
+      );
+    }
+
+    return result;
+  }
+
+  return value;
+}
+
+function createCodPayOptionKey(
+  option: any
+) {
+  const payload = JSON.stringify(
+    canonicalize(option)
+  );
+
+  return createHash("sha256")
+    .update(payload)
+    .digest("hex");
+}
 function getEcontErrorMessage(data: any) {
   if (typeof data?.message === "string" && data.message.trim()) {
     return data.message;
@@ -255,26 +288,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const hasCashOnDelivery =
-      orders.some((order) =>
-        String(
-          order.payment_method || ""
-        )
-          .toLowerCase()
-          .includes("наложен")
-      );
-
-    if (hasCashOnDelivery) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error:
-            "Поръчката е с наложен платеж. Първо трябва да настроим начина за изплащане на наложения платеж в Econt.",
-          code: "ECONT_COD_NOT_CONFIGURED",
-        },
-        { status: 400 }
-      );
-    }
+   const hasCashOnDelivery =
+  orders.some((order) =>
+    String(
+      order.payment_method || ""
+    )
+      .toLowerCase()
+      .includes("наложен")
+  );
 
     const {
       data: connection,
@@ -285,6 +306,7 @@ export async function POST(request: Request) {
         `
           client_id,
           sender_address_id,
+         cod_pay_option_key,
           is_connected
         `
       )
@@ -458,7 +480,91 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+let shipmentServices:
+  | Record<string, any>
+  | undefined;
 
+if (hasCashOnDelivery) {
+  const savedCodPayOptionKey =
+    typeof connection.cod_pay_option_key ===
+      "string"
+      ? connection.cod_pay_option_key.trim()
+      : "";
+
+  if (!savedCodPayOptionKey) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "Не е избран начин за изплащане на наложения платеж в настройките на Econt.",
+        code: "ECONT_COD_OPTION_REQUIRED",
+      },
+      { status: 400 }
+    );
+  }
+
+  const cdPayOptions =
+    Array.isArray(
+      selectedProfile.cdPayOptions
+    )
+      ? selectedProfile.cdPayOptions
+      : [];
+
+  const selectedCodPayOption =
+    cdPayOptions.find(
+      (option: any) =>
+        createCodPayOptionKey(
+          option
+        ) === savedCodPayOptionKey
+    );
+
+  if (!selectedCodPayOption) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "Запазеният начин за изплащане вече не е наличен в Econt профила. Изберете го отново в Настройки.",
+        code: "ECONT_COD_OPTION_NOT_FOUND",
+      },
+      { status: 400 }
+    );
+  }
+
+  const cdAmount = Number(
+    orders
+      .reduce(
+        (total, order) =>
+          total +
+          Number(
+            order.total_price || 0
+          ),
+        0
+      )
+      .toFixed(2)
+  );
+
+  if (
+    !Number.isFinite(cdAmount) ||
+    cdAmount <= 0
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "Невалидна сума за наложен платеж.",
+      },
+      { status: 400 }
+    );
+  }
+
+  shipmentServices = {
+    cdAmount,
+    cdType: "get",
+    cdCurrency: "EUR",
+    cdPayOptions:
+      selectedCodPayOption,
+  };
+}
     const shipmentDescription =
       orders
         .map((order) => {
@@ -517,9 +623,13 @@ export async function POST(request: Request) {
 
         weight,
 
-        shipmentDescription,
+       shipmentDescription,
 
-        orderNumber: checkoutId,
+orderNumber: checkoutId,
+
+...(shipmentServices
+  ? { services: shipmentServices }
+  : {}),
       },
 
       mode: "validate",
