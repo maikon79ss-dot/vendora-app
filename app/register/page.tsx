@@ -28,11 +28,12 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          store_slug: slug,
-        },
+       data: {
+  first_name: firstName,
+  last_name: lastName,
+  store_name: pageName,
+  store_slug: slug,
+},
       },
     });
 
