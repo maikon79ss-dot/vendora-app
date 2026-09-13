@@ -24,7 +24,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -40,27 +40,6 @@ export default function RegisterPage() {
     if (error) {
       setMessage("Грешка при регистрация: " + error.message);
       return;
-    }
-
-    if (data.user) {
-      const { error: profileError } = await supabase.from("profiles").upsert([
-        {
-          id: data.user.id,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          store_name: pageName,
-          store_slug: slug,
-          description: "Добре дошли в нашия магазин.",
-          plan: "free",
-        },
-      ]);
-
-      if (profileError) {
-        setMessage("Акаунтът е създаден, но има грешка с магазина.");
-        console.error(profileError);
-        return;
-      }
     }
 
     router.push("/dashboard");
