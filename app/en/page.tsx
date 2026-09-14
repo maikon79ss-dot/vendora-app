@@ -40,7 +40,7 @@ export default function HomeEn() {
             </Link>
 
             <Link
-              href="/register"
+              href="/en/register"
               className="rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-500"
             >
               Start for free
@@ -97,7 +97,7 @@ export default function HomeEn() {
                 </Link>
 
                 <Link
-                  href="/register"
+                 href="/en/register"
                   className="mt-2 block rounded-xl bg-blue-600 px-4 py-3 text-center font-bold text-white"
                 >
                   Start for free
@@ -133,7 +133,7 @@ export default function HomeEn() {
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <Link
-                href="/register"
+               href="/en/register"
                 className="rounded-xl bg-blue-600 px-7 py-4 text-center text-base font-bold shadow-lg shadow-blue-600/20 transition hover:bg-blue-500"
               >
                 Start for free
@@ -336,7 +336,7 @@ export default function HomeEn() {
           </p>
 
           <Link
-            href="/register"
+           href="/en/register"
             className="mt-8 inline-block rounded-xl bg-blue-600 px-8 py-4 font-bold transition hover:bg-blue-500"
           >
             Create your store
