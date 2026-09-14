@@ -28,7 +28,7 @@ export default function HomeEn() {
               Contact
             </Link>
 
-            <Link href="/login" className="transition hover:text-white">
+            <Link href="/en/login" className="transition hover:text-white">
               Login
             </Link>
 
@@ -49,7 +49,7 @@ export default function HomeEn() {
 
           <div className="flex items-center gap-3 md:hidden">
             <Link
-              href="/login"
+              href="/en/login"
               className="rounded-xl border border-white/20 px-4 py-2 text-sm font-bold"
             >
               Login
@@ -83,7 +83,7 @@ export default function HomeEn() {
                 </Link>
 
                 <Link
-                  href="/login"
+                  href="/en/login"
                   className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
                 >
                   👤 Login
@@ -361,7 +361,7 @@ export default function HomeEn() {
               Contact
             </Link>
 
-            <Link href="/login" className="hover:text-white">
+            <Link href="/en/login" className="hover:text-white">
               Login
             </Link>
 
