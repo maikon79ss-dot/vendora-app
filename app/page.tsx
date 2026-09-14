@@ -32,12 +32,19 @@ export default function Home() {
               Вход
             </Link>
 
-            <Link
-              href="/register"
-              className="rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-500"
-            >
-              Започни безплатно
-            </Link>
+ <Link
+  href="/en"
+  className="rounded-lg border border-white/20 px-3 py-2 text-xs font-bold transition hover:bg-white/10"
+>
+  EN
+</Link>
+
+<Link
+  href="/register"
+  className="rounded-xl bg-blue-600 px-5 py-3 text-white transition hover:bg-blue-500"
+>
+  Започни безплатно
+</Link>
           </nav>
 
          <div className="flex items-center gap-3 md:hidden">
@@ -81,7 +88,12 @@ export default function Home() {
       >
         👤 Вход
       </Link>
-
+<Link
+  href="/en"
+  className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
+>
+  🇬🇧 English
+</Link>
       <Link
         href="/register"
         className="mt-2 block rounded-xl bg-blue-600 px-4 py-3 text-center font-bold text-white"
@@ -344,9 +356,9 @@ export default function Home() {
       {/* Free plan */}
       <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
         <div className="overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-600/20 via-slate-900 to-slate-900 p-8 text-center sm:p-12">
-          <p className="font-bold text-blue-300">
-            Започни безплатно
-          </p>
+        <p className="font-bold text-blue-300">
+  Започни безплатно
+</p>
 
           <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-black sm:text-4xl">
             Започни с безплатен онлайн магазин.
