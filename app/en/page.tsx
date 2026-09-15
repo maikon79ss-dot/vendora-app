@@ -20,7 +20,7 @@ export default function HomeEn() {
               Plans
             </Link>
 
-            <Link href="/ai" className="transition hover:text-white">
+            <Link href="/en/ai" className="transition hover:text-white">
               Ask AI
             </Link>
 
@@ -69,7 +69,7 @@ export default function HomeEn() {
                 </Link>
 
                 <Link
-                  href="/ai"
+                  href="/en/ai"
                   className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
                 >
                   ✨ Ask AI
