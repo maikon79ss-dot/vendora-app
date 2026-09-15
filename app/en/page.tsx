@@ -16,7 +16,7 @@ export default function HomeEn() {
           </Link>
 
           <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-300 md:flex">
-            <Link href="/plan" className="transition hover:text-white">
+            <Link href="/en/plan" className="transition hover:text-white">
               Plans
             </Link>
 
@@ -62,7 +62,7 @@ export default function HomeEn() {
 
               <div className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 p-2 shadow-2xl">
                 <Link
-                  href="/plan"
+                  href="/en/plan"
                   className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
                 >
                   ⭐ Plans
@@ -353,7 +353,7 @@ export default function HomeEn() {
           </div>
 
           <div className="flex flex-wrap gap-5">
-            <Link href="/plan" className="hover:text-white">
+            <Link  href="/en/plan" className="hover:text-white">
               Plans
             </Link>
 
