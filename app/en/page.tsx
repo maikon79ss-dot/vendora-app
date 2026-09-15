@@ -1,4 +1,36 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Create Your Online Store Without Coding",
+  description:
+    "Create an online store with Vendora without coding. Add physical and digital products, accept orders and manage your store easily from one place.",
+  alternates: {
+    canonical: "https://www.vendora.trade/en",
+    languages: {
+      "bg-BG": "https://www.vendora.trade/",
+      "en": "https://www.vendora.trade/en",
+      "x-default": "https://www.vendora.trade/",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.vendora.trade/en",
+    siteName: "Vendora",
+    title: "Vendora – Create Your Online Store Without Coding",
+    description:
+      "Create an online store with Vendora without coding. Add physical and digital products, accept orders and manage your store easily from one place.",
+    images: [
+      {
+        url: "/vendora-home-new.png",
+        width: 1536,
+        height: 1024,
+        alt: "Vendora – online store builder",
+      },
+    ],
+  },
+};
 
 export default function HomeEn() {
   return (
