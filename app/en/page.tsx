@@ -24,7 +24,7 @@ export default function HomeEn() {
               Ask AI
             </Link>
 
-            <Link href="/contact" className="transition hover:text-white">
+            <Link href="/en/contact" className="transition hover:text-white">
               Contact
             </Link>
 
@@ -76,7 +76,7 @@ export default function HomeEn() {
                 </Link>
 
                 <Link
-                  href="/contact"
+                  href="/en/contact"
                   className="block rounded-xl px-4 py-3 font-semibold hover:bg-white/10"
                 >
                   ✉️ Contact
@@ -357,7 +357,7 @@ export default function HomeEn() {
               Plans
             </Link>
 
-            <Link href="/contact" className="hover:text-white">
+            <Link href="/en/contact" className="hover:text-white">
               Contact
             </Link>
 
