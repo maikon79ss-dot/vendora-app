@@ -34,7 +34,10 @@ export const metadata: Metadata = {
 
 export default function HomeEn() {
   return (
-    <main className="min-h-screen overflow-hidden bg-slate-950 text-white">
+    <main
+  lang="en"
+  className="min-h-screen overflow-hidden bg-slate-950 text-white"
+>
       {/* Header */}
       <header className="border-b border-white/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 lg:px-8">
