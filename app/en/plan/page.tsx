@@ -202,7 +202,10 @@ export default function PlanPageEn() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-100">
+      <main
+  lang="en"
+  className="flex min-h-screen items-center justify-center bg-gray-100"
+>
         <p className="text-lg font-semibold text-gray-600">
           Loading...
         </p>
@@ -211,7 +214,10 @@ export default function PlanPageEn() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 px-6 py-12">
+    <main
+  lang="en"
+  className="min-h-screen bg-gray-100 px-6 py-12"
+>
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-gray-900">
