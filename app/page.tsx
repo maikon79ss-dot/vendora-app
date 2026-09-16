@@ -1,4 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "https://www.vendora.trade/",
+    languages: {
+      "bg-BG": "https://www.vendora.trade/",
+      "en": "https://www.vendora.trade/en",
+      "x-default": "https://www.vendora.trade/",
+    },
+  },
+};
 
 export default function Home() {
   return (
