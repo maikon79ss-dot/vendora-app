@@ -199,7 +199,10 @@ Thank you for your patience!`
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
+    <main
+  lang="en"
+  className="min-h-screen bg-slate-950 px-6 py-10 text-white"
+>
       <div className="mx-auto max-w-6xl">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <Link href="/en" className="text-3xl font-extrabold">
