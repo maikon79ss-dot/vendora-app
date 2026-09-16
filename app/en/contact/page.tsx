@@ -58,7 +58,10 @@ ${message}`,
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-10 text-white">
+    <main
+  lang="en"
+  className="min-h-screen bg-slate-950 px-6 py-10 text-white"
+>
       <div className="mx-auto max-w-3xl">
         <div className="mb-8 flex items-center justify-between">
           <Link href="/en" className="text-3xl font-extrabold">
