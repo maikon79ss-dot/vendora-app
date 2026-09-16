@@ -14,6 +14,12 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 1,
   },
   {
+    url: `${baseUrl}/en`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 1,
+  },
+  {
     url: `${baseUrl}/sazdai-online-magazin`,
     lastModified: new Date(),
     changeFrequency: "weekly",
@@ -26,13 +32,19 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 0.9,
   },
   {
-  url: `${baseUrl}/kak-da-prodavash-online`,
-  lastModified: new Date(),
-  changeFrequency: "weekly",
-  priority: 0.9,
-},
+    url: `${baseUrl}/kak-da-prodavash-online`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  },
   {
     url: `${baseUrl}/plan`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.9,
+  },
+  {
+    url: `${baseUrl}/en/plan`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.9,
@@ -44,7 +56,19 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 0.8,
   },
   {
+    url: `${baseUrl}/en/ai`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  },
+  {
     url: `${baseUrl}/contact`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.6,
+  },
+  {
+    url: `${baseUrl}/en/contact`,
     lastModified: new Date(),
     changeFrequency: "monthly",
     priority: 0.6,
