@@ -258,7 +258,7 @@ async function submitOrder(e: React.FormEvent) {
     !address ||
     !city
   ) {
-    setMessage("Моля, попълнете всички задължителни полета.");
+   setMessage("Please fill in all required fields.");
     return;
   }
 
@@ -282,28 +282,33 @@ async function submitOrder(e: React.FormEvent) {
 
  if (error) {
   console.error(error);
-  setMessage("Грешка при изпращане на поръчката.");
+  setMessage("There was an error submitting the order.");
   return;
 }
-
+const paymentMethodLabel =
+  paymentMethod === "Банков превод"
+    ? "Bank transfer"
+    : paymentMethod === "Наложен платеж"
+      ? "Cash on delivery"
+      : paymentMethod;
 try {
-  await sendOrderEmail(
-    customerEmail,
-    "Потвърждение за поръчка",
-    `Здравейте, ${customerName}!
+await sendOrderEmail(
+  customerEmail,
+  "Order confirmation",
+  `Hello, ${customerName}!
 
-Благодарим за вашата поръчка.
+Thank you for your order.
 
-Продукт: ${product.name}
-Количество: ${quantity}
-Обща стойност: ${(Number(product.price) * quantity).toFixed(2)} €
-Начин на плащане: ${paymentMethod}
+Product: ${product.name}
+Quantity: ${quantity}
+Total: ${(Number(product.price) * quantity).toFixed(2)} €
+Payment method: ${paymentMethodLabel}
 
-Ще получите нов имейл, когато статусът на поръчката бъде променен.
+You will receive another email when the order status changes.
 
-Поздрави,
+Best regards,
 Vendora`
-  );
+);
 if (sellerEmail) {
   await sendSellerEmail(
     sellerEmail,
@@ -316,13 +321,13 @@ if (sellerEmail) {
     Number(product.price) * quantity
   );
 }
-  setMessage("Поръчката е изпратена успешно.");
+ setMessage("Your order has been submitted successfully.");
 } catch (emailError) {
   console.error(emailError);
 
-  setMessage(
-    "Поръчката е записана, но имейлът не беше изпратен."
-  );
+setMessage(
+  "Your order was saved, but the confirmation email could not be sent."
+);
 }
 
 setShowOrderForm(false);
@@ -333,7 +338,7 @@ async function submitReview(e: React.FormEvent) {
   if (!product) return;
 
   if (!reviewName.trim() || !reviewComment.trim()) {
-    setReviewMessage("Моля, попълнете име и коментар.");
+    setReviewMessage("Please enter your name and comment.");
     return;
   }
 
@@ -352,7 +357,7 @@ async function submitReview(e: React.FormEvent) {
 
   if (error) {
     console.error(error);
-    setReviewMessage("Грешка при изпращане на ревюто.");
+   setReviewMessage("There was an error submitting your review.");
     return;
   }
 
@@ -360,11 +365,15 @@ async function submitReview(e: React.FormEvent) {
   setReviewName("");
   setReviewRating(5);
   setReviewComment("");
-  setReviewMessage("Ревюто е публикувано успешно.");
+ setReviewMessage("Your review has been published successfully.");
 }
 
   if (!product) {
-    return <main className="p-10">Зареждане...</main>;
+   return (
+  <main lang="en" className="p-10">
+    Loading...
+  </main>
+);
   }
 
   const allImages = [
@@ -379,7 +388,10 @@ const averageRating =
       ) / reviews.length
     : 0;
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
+    <main
+  lang="en"
+  className="min-h-screen bg-gray-100 p-10"
+>
       <div className="mx-auto grid max-w-5xl gap-10 rounded-2xl bg-white p-8 shadow md:grid-cols-2">
         <div>
           {selectedImage ? (
@@ -411,9 +423,9 @@ const averageRating =
               )}
             </div>
           ) : (
-            <div className="flex h-96 items-center justify-center rounded-xl bg-gray-200 text-gray-500">
-              Няма снимка
-            </div>
+           <div className="flex h-96 items-center justify-center rounded-xl bg-gray-200 text-gray-500">
+  No image
+</div>
           )}
 
           {allImages.length > 1 && (
@@ -447,22 +459,22 @@ const averageRating =
             € {product.price}
           </p>
 
-          {product.stock > 0 ? (
-            <p className="mt-3 font-semibold text-green-600">
-              ✔ В наличност: {product.stock} бр.
-            </p>
-          ) : (
-            <p className="mt-3 font-semibold text-red-600">
-              ❌ Изчерпан
-            </p>
-          )}
+         {product.stock > 0 ? (
+  <p className="mt-3 font-semibold text-green-600">
+    ✔ In stock: {product.stock}
+  </p>
+) : (
+  <p className="mt-3 font-semibold text-red-600">
+    ❌ Out of stock
+  </p>
+)}
 
           <p className="mt-6 text-gray-600">{product.description}</p>
 
           <label className="mt-8 block font-semibold">
             {product.has_variants
-              ? product.variant_name
-              : "Вариант"}
+  ? product.variant_name
+  : "Variant"}
           </label>
 
           <select
@@ -476,13 +488,13 @@ const averageRating =
                 <option key={value}>{value}</option>
               ))
             ) : (
-              <option>Стандартен</option>
+            <option value="Стандартен">Standard</option>
             )}
           </select>
 
-          <label className="mt-5 block font-semibold">
-            Количество
-          </label>
+         <label className="mt-5 block font-semibold">
+  Quantity
+</label>
 
           <input
             type="number"
@@ -503,9 +515,9 @@ const averageRating =
             className="mt-2 w-full rounded-lg border p-3"
           />
 
-          <label className="mt-5 block font-semibold">
-            Начин на плащане
-          </label>
+       <label className="mt-5 block font-semibold">
+  Payment method
+</label>
 
          <select
   value={paymentMethod}
@@ -515,61 +527,61 @@ const averageRating =
   <option>Stripe</option>
   <option>PayPal</option>
   <option>Revolut</option>
-  <option>Банков превод</option>
-  <option>Наложен платеж</option>
+ <option value="Банков превод">Bank transfer</option>
+<option value="Наложен платеж">Cash on delivery</option>
 </select>
 {paymentMethod === "Stripe" && (
   <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-    <h3 className="font-semibold text-blue-700">
-      💳 Плащане със Stripe
-    </h3>
-    <p className="mt-2 text-sm text-gray-700">
-      Ще бъдете пренасочени към защитената страница на Stripe за сигурно плащане с карта.
-    </p>
+  <h3 className="font-semibold text-blue-700">
+  💳 Pay with Stripe
+</h3>
+<p className="mt-2 text-sm text-gray-700">
+  You will be redirected to Stripe&apos;s secure checkout page to pay safely by card.
+</p>
   </div>
 )}
 
 {paymentMethod === "PayPal" && (
   <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-    <h3 className="font-semibold text-blue-700">
-      🟦 Плащане с PayPal
-    </h3>
-    <p className="mt-2 text-sm text-gray-700">
-      След натискане на "Купи сега" ще бъдете пренасочени към PayPal.
-    </p>
+  <h3 className="font-semibold text-blue-700">
+  🟦 Pay with PayPal
+</h3>
+<p className="mt-2 text-sm text-gray-700">
+  You will be redirected to PayPal to complete your payment.
+</p>
   </div>
 )}
 
 {paymentMethod === "Revolut" && (
   <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 p-4">
-    <h3 className="font-semibold text-purple-700">
-      💜 Плащане с Revolut
-    </h3>
-    <p className="mt-2 text-sm text-gray-700">
-      След натискане на "Купи сега" ще бъдете пренасочени към Revolut за сигурно плащане.
-    </p>
+  <h3 className="font-semibold text-purple-700">
+  💜 Pay with Revolut
+</h3>
+<p className="mt-2 text-sm text-gray-700">
+  You will be redirected to Revolut to complete your payment securely.
+</p>
   </div>
 )}
 
 {paymentMethod === "Банков превод" && (
   <div className="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
     <h3 className="font-semibold text-green-700">
-      🏦 Банков превод
+      🏦 Bank transfer
     </h3>
-    <p className="mt-2 text-sm text-gray-700">
-      След потвърждение на поръчката ще получите банковите данни на продавача.
-    </p>
+   <p className="mt-2 text-sm text-gray-700">
+  After confirming the order, you will receive the seller&apos;s bank details.
+</p>
   </div>
 )}
 
 {paymentMethod === "Наложен платеж" && (
   <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4">
     <h3 className="font-semibold text-orange-700">
-      🚚 Наложен платеж
+      🚚 Cash on delivery
     </h3>
-    <p className="mt-2 text-sm text-gray-700">
-      Заплащането ще се извърши при доставка на поръчката.
-    </p>
+   <p className="mt-2 text-sm text-gray-700">
+  Payment will be made when the order is delivered.
+</p>
   </div>
 )}
 
@@ -582,7 +594,7 @@ const averageRating =
     onClick={handleAddToCart}
     className="block w-full rounded-lg bg-blue-600 py-4 text-center text-white"
   >
-    🛒 Добави в количката
+    🛒 Add to cart
   </button>
 </div>
           ) : (
@@ -590,7 +602,7 @@ const averageRating =
               disabled
               className="mt-8 block w-full cursor-not-allowed rounded-lg bg-gray-400 py-4 text-center text-white"
             >
-              ❌ Изчерпан
+              ❌ Out of stock
             </button>
           )}
 
@@ -606,60 +618,60 @@ const averageRating =
           className="mx-auto mt-8 max-w-5xl rounded-2xl bg-white p-8 shadow"
         >
           <h2 className="mb-6 text-3xl font-bold">
-            Данни за поръчка
+           Order details
           </h2>
 
           <input
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Име и фамилия"
+            placeholder="Full name"
             className="mb-4 w-full rounded-lg border p-3"
           />
 
           <input
             value={customerEmail}
             onChange={(e) => setCustomerEmail(e.target.value)}
-            placeholder="Имейл"
+            placeholder="Email"
             className="mb-4 w-full rounded-lg border p-3"
           />
 
           <input
             value={customerPhone}
             onChange={(e) => setCustomerPhone(e.target.value)}
-            placeholder="Телефон"
+            placeholder="Phone"
             className="mb-4 w-full rounded-lg border p-3"
           />
 
           <input
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="Адрес"
+            placeholder="Address"
             className="mb-4 w-full rounded-lg border p-3"
           />
 
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="Град"
+            placeholder="City"
             className="mb-4 w-full rounded-lg border p-3"
           />
 
           <input
             value={postalCode}
             onChange={(e) => setPostalCode(e.target.value)}
-            placeholder="Пощенски код"
+            placeholder="Postal code"
             className="mb-6 w-full rounded-lg border p-3"
           />
 
           <button className="w-full rounded-lg bg-green-600 py-4 text-white">
-            Изпрати поръчката
+           Place order
           </button>
         </form>
       )}
       <section className="mx-auto mt-8 max-w-5xl rounded-2xl bg-white p-8 shadow">
   <div className="flex flex-wrap items-center justify-between gap-4">
     <div>
-      <h2 className="text-3xl font-bold">⭐ Ревюта и оценки</h2>
+      <h2 className="text-3xl font-bold">⭐ Reviews and ratings</h2>
 
       {reviews.length > 0 ? (
         <p className="mt-3 text-lg">
@@ -669,16 +681,16 @@ const averageRating =
           </span>
 
           <span className="ml-3 font-semibold">
-            {averageRating.toFixed(1)} от 5
+           {averageRating.toFixed(1)} out of 5
           </span>
 
           <span className="ml-2 text-gray-500">
-            ({reviews.length} оценки)
+            ({reviews.length} ratings)
           </span>
         </p>
       ) : (
         <p className="mt-3 text-gray-500">
-          Все още няма публикувани ревюта.
+         No reviews have been published yet. 
         </p>
       )}
     </div>
@@ -688,37 +700,37 @@ const averageRating =
     onSubmit={submitReview}
     className="mt-8 rounded-xl bg-gray-50 p-6"
   >
-    <h3 className="text-2xl font-bold">Оставете ревю</h3>
+    <h3 className="text-2xl font-bold">Leave a review</h3>
 
-    <label className="mt-5 block font-semibold">Вашето име</label>
+    <label className="mt-5 block font-semibold">Your name</label>
 
     <input
       value={reviewName}
       onChange={(e) => setReviewName(e.target.value)}
-      placeholder="Име"
+      placeholder="Name"
       className="mt-2 w-full rounded-lg border p-3"
     />
 
-    <label className="mt-5 block font-semibold">Оценка</label>
+    <label className="mt-5 block font-semibold">Rating</label>
 
     <select
       value={reviewRating}
       onChange={(e) => setReviewRating(Number(e.target.value))}
       className="mt-2 w-full rounded-lg border p-3"
     >
-      <option value={5}>★★★★★ — Отлично</option>
-      <option value={4}>★★★★☆ — Много добро</option>
-      <option value={3}>★★★☆☆ — Добро</option>
-      <option value={2}>★★☆☆☆ — Слабо</option>
-      <option value={1}>★☆☆☆☆ — Лошо</option>
+    <option value={5}>★★★★★ — Excellent</option>
+<option value={4}>★★★★☆ — Very good</option>
+<option value={3}>★★★☆☆ — Good</option>
+<option value={2}>★★☆☆☆ — Poor</option>
+<option value={1}>★☆☆☆☆ — Bad</option>
     </select>
 
-    <label className="mt-5 block font-semibold">Коментар</label>
+    <label className="mt-5 block font-semibold">Comment</label>
 
     <textarea
       value={reviewComment}
       onChange={(e) => setReviewComment(e.target.value)}
-      placeholder="Напишете вашето мнение..."
+      placeholder="Write your review..."
       className="mt-2 h-32 w-full rounded-lg border p-3"
     />
 
@@ -726,7 +738,7 @@ const averageRating =
       type="submit"
       className="mt-5 w-full rounded-lg bg-yellow-500 py-4 font-semibold text-white"
     >
-      ⭐ Изпрати ревю
+      ⭐ Submit review
     </button>
 
     {reviewMessage && (
@@ -751,7 +763,7 @@ const averageRating =
           </div>
 
           <p className="text-sm text-gray-500">
-            {new Date(review.created_at).toLocaleDateString("bg-BG")}
+            {new Date(review.created_at).toLocaleDateString("en-GB")}
           </p>
         </div>
 
