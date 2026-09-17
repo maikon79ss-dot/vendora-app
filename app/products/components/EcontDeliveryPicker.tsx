@@ -29,11 +29,13 @@ export type EcontSelection = {
 type EcontDeliveryPickerProps = {
   ownerId?: string;
   onChange?: (selection: EcontSelection | null) => void;
+  language?: "bg" | "en";
 };
 
 export default function EcontDeliveryPicker({
   ownerId,
   onChange,
+  language = "bg",
 }: EcontDeliveryPickerProps) {
   const [cities, setCities] = useState<EcontCity[]>([]);
   const [cityId, setCityId] = useState("");
@@ -50,6 +52,7 @@ const selectedCity = cities.find(
 const selectedOffice = offices.find(
   (office) => String(office.id) === officeId
 );
+  const isEnglish = language === "en";
   useEffect(() => {
     let isActive = true;
 
@@ -81,9 +84,11 @@ const response = await fetch(citiesUrl, {
         }
       } catch {
         if (isActive) {
-          setError(
-            "Градовете на Econt не можаха да бъдат заредени."
-          );
+         setError(
+  language === "en"
+    ? "Econt cities could not be loaded."
+    : "Градовете на Econt не можаха да бъдат заредени."
+);
         }
       } finally {
         if (isActive) {
@@ -97,7 +102,7 @@ const response = await fetch(citiesUrl, {
     return () => {
       isActive = false;
     };
-  }, [ownerId]);
+  }, [ownerId, language]);
 
   async function handleCityChange(nextCityId: string) {
     setCityId(nextCityId);
@@ -134,9 +139,11 @@ const response = await fetch(officesUrl, {
 
       setOffices(data.offices || []);
     } catch {
-      setError(
-        "Офисите на Econt не можаха да бъдат заредени."
-      );
+    setError(
+  language === "en"
+    ? "Econt offices could not be loaded."
+    : "Офисите на Econt не можаха да бъдат заредени."
+);
     } finally {
       setLoadingOffices(false);
     }
@@ -174,13 +181,13 @@ onChange?.({
 }
   return (
     <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
-      <p className="mb-4 font-semibold text-green-800">
-        📦 Econt доставка
-      </p>
+    <p className="mb-4 font-semibold text-green-800">
+  {isEnglish ? "📦 Econt delivery" : "📦 Econt доставка"}
+</p>
 
-      <label className="mb-2 block font-semibold">
-        Населено място
-      </label>
+<label className="mb-2 block font-semibold">
+  {isEnglish ? "City" : "Населено място"}
+</label>
 
       <select
         value={cityId}
@@ -189,9 +196,13 @@ onChange?.({
         className="mb-4 w-full rounded-lg border p-3"
       >
         <option value="">
-          {loadingCities
-            ? "Зареждане на населените места..."
-            : "Изберете населено място"}
+        {loadingCities
+  ? isEnglish
+    ? "Loading cities..."
+    : "Зареждане на населените места..."
+  : isEnglish
+    ? "Select a city"
+    : "Изберете населено място"}
         </option>
 
         {cities.map((city) => (
@@ -203,8 +214,8 @@ onChange?.({
       </select>
 
       <label className="mb-2 block font-semibold">
-        Офис на Econt
-      </label>
+  {isEnglish ? "Econt office" : "Офис на Econt"}
+</label>
 
       <select
         value={officeId}
@@ -213,11 +224,17 @@ onChange?.({
         className="w-full rounded-lg border p-3"
       >
         <option value="">
-          {loadingOffices
-            ? "Зареждане на офисите..."
-            : cityId
-              ? "Изберете офис"
-              : "Първо изберете населено място"}
+        {loadingOffices
+  ? isEnglish
+    ? "Loading offices..."
+    : "Зареждане на офисите..."
+  : cityId
+    ? isEnglish
+      ? "Select an office"
+      : "Изберете офис"
+    : isEnglish
+      ? "Select a city first"
+      : "Първо изберете населено място"}
         </option>
 
         {offices.map((office) => (
@@ -230,19 +247,25 @@ onChange?.({
         ))}
       </select>
 
-      {cityId && !loadingOffices && offices.length > 0 && (
-        <p className="mt-3 text-sm text-gray-600">
-          Намерени офиси: {offices.length}
-        </p>
-      )}
+{cityId && !loadingOffices && offices.length > 0 && (
+  <p className="mt-3 text-sm text-gray-600">
+    {isEnglish ? "Offices found" : "Намерени офиси"}:{" "}
+    {offices.length}
+  </p>
+)}
+
 {selectedCity && selectedOffice && (
   <div className="mt-4 rounded-lg border border-green-300 bg-white p-4">
     <p className="font-semibold text-green-800">
-      ✅ Избрана Econt доставка
+      {isEnglish
+        ? "✅ Selected Econt delivery"
+        : "✅ Избрана Econt доставка"}
     </p>
 
     <p className="mt-2 text-sm text-gray-700">
-      <strong>Населено място:</strong>{" "}
+      <strong>
+        {isEnglish ? "City:" : "Населено място:"}
+      </strong>{" "}
       {selectedCity.name}
       {selectedCity.postCode
         ? ` (${selectedCity.postCode})`
@@ -250,12 +273,17 @@ onChange?.({
     </p>
 
     <p className="mt-2 text-sm text-gray-700">
-      <strong>Офис:</strong> {selectedOffice.name}
+      <strong>
+        {isEnglish ? "Office:" : "Офис:"}
+      </strong>{" "}
+      {selectedOffice.name}
     </p>
 
     {selectedOffice.address?.fullAddress && (
       <p className="mt-2 text-sm text-gray-600">
-        <strong>Адрес:</strong>{" "}
+        <strong>
+          {isEnglish ? "Address:" : "Адрес:"}
+        </strong>{" "}
         {selectedOffice.address.fullAddress}
       </p>
     )}
