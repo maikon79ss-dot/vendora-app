@@ -325,7 +325,7 @@ async function applyCoupon() {
   const normalizedCode = couponCode.trim().toUpperCase();
 
   if (!normalizedCode) {
-    setMessage("Въведете код за отстъпка.");
+    setMessage("Enter a discount code.");
     return;
   }
 
@@ -333,13 +333,12 @@ async function applyCoupon() {
     new Set(cartItems.map((item) => item.storeSlug))
   );
 
-  if (storeSlugs.length !== 1) {
-    setMessage(
-      "Купонът може да се използва само за продукти от един магазин."
-    );
-    return;
-  }
-
+ if (storeSlugs.length !== 1) {
+  setMessage(
+    "The coupon can only be used for products from one store."
+  );
+  return;
+}
   const { data: coupon, error } = await supabase
     .from("discount_coupons")
     .select("*")
@@ -350,14 +349,14 @@ async function applyCoupon() {
 
   if (error) {
     console.error(error);
-    setMessage("Грешка при проверка на купона.");
+    setMessage("There was an error checking the coupon.");
     return;
   }
 
   if (!coupon) {
     setDiscountAmount(0);
     setAppliedCoupon("");
-    setMessage("Невалиден или неактивен купон.");
+    setMessage("Invalid or inactive coupon.");
     return;
   }
 
@@ -367,7 +366,7 @@ async function applyCoupon() {
   ) {
     setDiscountAmount(0);
     setAppliedCoupon("");
-    setMessage("Срокът на този купон е изтекъл.");
+    setMessage("This coupon has expired.");
     return;
   }
 
@@ -377,18 +376,18 @@ async function applyCoupon() {
   ) {
     setDiscountAmount(0);
     setAppliedCoupon("");
-    setMessage("Лимитът за използване на този купон е достигнат.");
+    setMessage("The usage limit for this coupon has been reached.");
     return;
   }
 
   if (cartTotal < Number(coupon.minimum_order || 0)) {
     setDiscountAmount(0);
     setAppliedCoupon("");
-    setMessage(
-      `Минималната стойност за този купон е ${Number(
-        coupon.minimum_order
-      ).toFixed(2)} €.`
-    );
+   setMessage(
+  `The minimum order amount for this coupon is ${Number(
+    coupon.minimum_order
+  ).toFixed(2)} €.`
+);
     return;
   }
 
@@ -405,9 +404,9 @@ async function applyCoupon() {
 
   setDiscountAmount(calculatedDiscount);
   setAppliedCoupon(normalizedCode);
-  setMessage(
-    `Купонът е приложен. Спестявате ${calculatedDiscount.toFixed(2)} €.`
-  );
+ setMessage(
+  `Coupon applied. You save ${calculatedDiscount.toFixed(2)} €.`
+);
 }
 
 async function submitCheckout(e: React.FormEvent) {
@@ -418,7 +417,7 @@ async function submitCheckout(e: React.FormEvent) {
   !customerEmail ||
   !customerPhone
 ) {
-  setMessage("Моля, попълнете всички задължителни полета.");
+  setMessage("Please fill in all required fields.");
   return;
 }
 
@@ -426,7 +425,7 @@ if (
   deliveryMethod === "Доставка до адрес" &&
   (!address || !city)
 ) {
-  setMessage("Моля, попълнете адрес и град.");
+  setMessage("Please enter your address and city.");
   return;
 }
 
@@ -434,7 +433,7 @@ if (
   deliveryMethod === "Econt офис" &&
   !econtSelection
 ) {
-  setMessage("Моля, изберете населено място и офис на Econt.");
+  setMessage("Please select a city and an Econt office.");
   return;
 }
 
