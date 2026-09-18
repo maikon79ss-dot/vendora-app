@@ -613,22 +613,22 @@ if (paymentMethod === "PayPal") {
   }
 
   try {
-    await sendOrderEmail(
-      customerEmail,
-      "Поръчката ви във Vendora – PayPal",
-      `Здравейте, ${customerName}!
+  await sendOrderEmail(
+  customerEmail,
+  "Your Vendora order – PayPal",
+  `Hello, ${customerName}!
 
-Вашата поръчка е записана.
+Your order has been placed.
 
-Номер на поръчката: ${checkoutId}
-Обща стойност: ${finalTotal.toFixed(2)} €
-Начин на плащане: PayPal
+Order number: ${checkoutId}
+Total: ${finalTotal.toFixed(2)} €
+Payment method: PayPal
 
-Сега ще бъдете прехвърлени към PayPal, за да извършите плащането.
+You will now be redirected to PayPal to complete the payment.
 
-Поздрави,
+Best regards,
 Vendora`
-    );
+);
 
     const sellerOwnerId = cartItems[0]?.ownerId;
 
