@@ -439,7 +439,7 @@ if (
 }
 
   if (cartItems.length === 0) {
-    setMessage("Количката е празна.");
+    setMessage("Your cart is empty.");
     return;
   }
 const orderAddress =
@@ -955,12 +955,15 @@ Vendora`
 
   if (cartItems.length === 0) {
     return (
-      <main className="min-h-screen bg-gray-100 p-10">
+      <main
+  lang="en"
+  className="min-h-screen bg-gray-100 p-10"
+>
         <div className="mx-auto max-w-4xl rounded-2xl bg-white p-10 text-center shadow">
-          <h1 className="text-4xl font-bold">🛒 Количка</h1>
+          <h1 className="text-4xl font-bold">🛒 Cart</h1>
 
           <p className="mt-6 text-lg text-gray-600">
-            {message || "Количката е празна."}
+            {message || "Your cart is empty."}
           </p>
 {bankTransferInfo && (
   <div className="mx-auto mt-8 max-w-xl rounded-2xl border bg-blue-50 p-6 text-left">
@@ -1070,14 +1073,17 @@ Vendora`
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
+    <main
+  lang="en"
+  className="min-h-screen bg-gray-100 p-10"
+>
       <div className="mx-auto max-w-5xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold">🛒 Количка</h1>
+            <h1 className="text-4xl font-bold">🛒 Cart</h1>
 
             <p className="mt-2 text-gray-600">
-              Общо продукти: {cartCount}
+             Total items: {cartCount}
             </p>
           </div>
 
@@ -1086,7 +1092,7 @@ Vendora`
             onClick={clearCart}
             className="rounded-lg bg-red-600 px-5 py-3 text-white"
           >
-            Изчисти количката
+            Clear cart
           </button>
         </div>
 
@@ -1104,7 +1110,7 @@ Vendora`
                 />
               ) : (
                 <div className="flex h-40 items-center justify-center rounded-xl bg-gray-200 text-gray-500">
-                  Няма снимка
+                  No image
                 </div>
               )}
 
@@ -1112,7 +1118,7 @@ Vendora`
                 <h2 className="text-2xl font-bold">{item.name}</h2>
 
                 <p className="mt-2 text-gray-600">
-                  Вариант: {item.variant}
+                  Variant: {item.variant}
                 </p>
 
                 <p className="mt-2 text-xl font-semibold text-blue-600">
@@ -1160,12 +1166,12 @@ Vendora`
                     }
                     className="ml-auto rounded-lg bg-red-600 px-5 py-2 text-white"
                   >
-                    🗑 Премахни
+                    🗑 Remove
                   </button>
                 </div>
 
                 <p className="mt-5 font-semibold">
-                  Междинна сума:{" "}
+                 Subtotal: {" "}
                   {(item.price * item.quantity).toFixed(2)} €
                 </p>
               </div>
