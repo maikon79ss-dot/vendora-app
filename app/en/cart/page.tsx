@@ -954,7 +954,7 @@ Vendora`
   setCouponCode("");
   setAppliedCoupon("");
   setDiscountAmount(0);
-  setMessage("✅ Благодарим! Поръчката е изпратена успешно.");
+  setMessage("✅ Thank you! Your order has been submitted successfully.");
   setIsSubmitting(false);
 }
 
