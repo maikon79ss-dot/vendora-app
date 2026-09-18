@@ -244,7 +244,7 @@ function handleAddToCart() {
     ownerId: product.owner_id,
   });
 
-  router.push("/cart");
+  router.push("/en/cart");
 }
 async function submitOrder(e: React.FormEvent) {
   e.preventDefault();
