@@ -514,7 +514,7 @@ quantity: item.quantity,
 
   if (error) {
     console.error(error);
-    setMessage("Грешка при изпращане на поръчката.");
+    setMessage("There was an error submitting your order.");
     setIsSubmitting(false);
     return;
   }
@@ -532,8 +532,8 @@ if (paymentMethod === "Stripe") {
 
   if (ownerIds.length !== 1) {
     setMessage(
-      "Stripe плащането може да съдържа продукти само от един магазин."
-    );
+  "Stripe checkout can only contain products from one store."
+  );
     setIsSubmitting(false);
     return;
   }
@@ -572,8 +572,8 @@ if (paymentMethod === "Stripe") {
       );
 
       setMessage(
-        result.error ||
-          "Неуспешно създаване на Stripe плащането."
+       result.error ||
+  "Stripe checkout could not be created."
       );
 
       setIsSubmitting(false);
@@ -581,9 +581,9 @@ if (paymentMethod === "Stripe") {
     }
 
     if (!result.url) {
-      setMessage(
-        "Stripe не върна адрес за плащане."
-      );
+    setMessage(
+  "Stripe did not return a payment URL."
+);
       setIsSubmitting(false);
       return;
     }
@@ -593,9 +593,9 @@ if (paymentMethod === "Stripe") {
   } catch (stripeError) {
     console.error(stripeError);
 
-    setMessage(
-      "Грешка при свързване със Stripe."
-    );
+   setMessage(
+  "There was an error connecting to Stripe."
+);
 
     setIsSubmitting(false);
     return;
@@ -605,9 +605,9 @@ if (paymentMethod === "Stripe") {
 
 if (paymentMethod === "PayPal") {
   if (!paymentLinks.paypal) {
-    setMessage(
-      "Продавачът не е настроил PayPal."
-    );
+  setMessage(
+  "The seller has not configured PayPal."
+);
     setIsSubmitting(false);
     return;
   }
@@ -681,9 +681,9 @@ Vendora`
 }
   if (paymentMethod === "Revolut") {
   if (!paymentLinks.revolut) {
-    setMessage(
-      "Продавачът не е настроил Revolut."
-    );
+   setMessage(
+  "The seller has not configured Revolut."
+);
     setIsSubmitting(false);
     return;
   }
@@ -761,9 +761,9 @@ if (paymentMethod === "Банков превод") {
     !paymentLinks.bankIban ||
     !paymentLinks.bankName
   ) {
-    setMessage(
-      "Продавачът не е попълнил данните за банков превод."
-    );
+  setMessage(
+  "The seller has not provided bank transfer details."
+);
     setIsSubmitting(false);
     return;
   }
