@@ -1182,7 +1182,7 @@ Vendora`
         <div className="mt-8 rounded-2xl bg-white p-8 shadow">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-gray-600">Обща стойност</p>
+              <p className="text-gray-600">Total</p>
 
               {discountAmount > 0 && (
   <>
@@ -1191,7 +1191,7 @@ Vendora`
     </p>
 
     <p className="mt-2 font-semibold text-green-600">
-      Отстъпка: −{discountAmount.toFixed(2)} €
+      Discount: −{discountAmount.toFixed(2)} €
     </p>
   </>
 )}
@@ -1201,7 +1201,7 @@ Vendora`
 </p>
 <div className="mt-8 rounded-2xl bg-white p-5 shadow sm:p-8">
   <h2 className="text-xl font-bold sm:text-2xl">
-    🎟 Код за отстъпка
+    🎟 Discount code
   </h2>
 
   <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -1212,7 +1212,7 @@ Vendora`
           e.target.value.toUpperCase()
         )
       }
-      placeholder="Например: WELCOME10"
+      placeholder="For example: WELCOME10"
       className="min-w-0 w-full rounded-lg border p-3 sm:flex-1"
     />
 
@@ -1221,13 +1221,13 @@ Vendora`
       onClick={applyCoupon}
       className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white sm:w-auto"
     >
-      Приложи
+      Apply
     </button>
   </div>
 </div>
   {appliedCoupon && (
     <p className="mt-4 font-semibold text-green-600">
-      ✔ Активен купон: {appliedCoupon}
+      ✔ Active coupon: {appliedCoupon}
     </p>
   )}
 </div>
@@ -1236,7 +1236,7 @@ Vendora`
               onClick={() => setShowCheckoutForm(true)}
               className="rounded-xl bg-green-600 px-8 py-4 text-lg font-semibold text-white"
             >
-              Завърши поръчката
+              Proceed to checkout
             </button>
           </div>
         </div>
