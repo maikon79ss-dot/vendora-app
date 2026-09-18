@@ -855,22 +855,28 @@ Vendora`
   return;
 }
 try {
-  await sendOrderEmail(
-    customerEmail,
-    "Потвърждение за поръчка",
-    `Здравейте, ${customerName}!
+await sendOrderEmail(
+  customerEmail,
+  "Order confirmation – Vendora",
+  `Hello, ${customerName}!
 
-Благодарим за вашата поръчка.
+Thank you for your order.
 
-Номер на поръчката: ${checkoutId}
-Обща стойност: ${finalTotal.toFixed(2)} €
-Начин на плащане: ${paymentMethod}
+Order number: ${checkoutId}
+Total: ${finalTotal.toFixed(2)} €
+Payment method: ${
+  paymentMethod === "Наложен платеж"
+    ? "Cash on delivery"
+    : paymentMethod === "Банков превод"
+    ? "Bank transfer"
+    : paymentMethod
+}
 
-Ще получите нов имейл, когато статусът на поръчката бъде променен.
+You will receive another email when the order status changes.
 
-Поздрави,
+Best regards,
 Vendora`
-  );
+);
 } catch (emailError) {
   console.error(emailError);
 
