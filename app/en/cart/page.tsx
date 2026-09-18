@@ -689,22 +689,22 @@ Vendora`
   }
 
   try {
-    await sendOrderEmail(
-      customerEmail,
-      "Поръчката ви във Vendora – Revolut",
-      `Здравейте, ${customerName}!
+await sendOrderEmail(
+  customerEmail,
+  "Your Vendora order – Revolut",
+  `Hello, ${customerName}!
 
-Вашата поръчка е записана.
+Your order has been placed.
 
-Номер на поръчката: ${checkoutId}
-Обща стойност: ${finalTotal.toFixed(2)} €
-Начин на плащане: Revolut
+Order number: ${checkoutId}
+Total: ${finalTotal.toFixed(2)} €
+Payment method: Revolut
 
-Сега ще бъдете прехвърлени към Revolut, за да извършите плащането.
+You will now be redirected to Revolut to complete the payment.
 
-Поздрави,
+Best regards,
 Vendora`
-    );
+);
 
     const sellerOwnerId = cartItems[0]?.ownerId;
 
