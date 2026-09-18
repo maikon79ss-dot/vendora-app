@@ -92,17 +92,18 @@ const [appliedCoupon, setAppliedCoupon] =
 const [
   continueShoppingUrl,
   setContinueShoppingUrl,
-] = useState("/products");
+] = useState("/en");
+
 useEffect(() => {
   const currentStoreSlug = cartItems[0]?.storeSlug;
 
   if (currentStoreSlug) {
-    const storeUrl = `/store/${currentStoreSlug}`;
+    const storeUrl = `/en/store/${currentStoreSlug}`;
 
     setContinueShoppingUrl(storeUrl);
 
     localStorage.setItem(
-      "vendora_last_store_url",
+      "vendora_last_store_url_en",
       storeUrl
     );
 
@@ -110,7 +111,7 @@ useEffect(() => {
   }
 
   const savedStoreUrl = localStorage.getItem(
-    "vendora_last_store_url"
+    "vendora_last_store_url_en"
   );
 
   if (savedStoreUrl) {
@@ -1070,7 +1071,7 @@ Vendora`
   href={continueShoppingUrl}
   className="mt-8 inline-block rounded-lg bg-blue-600 px-6 py-3 text-white"
 >
-  Продължи пазаруването
+  Continue shopping
 </Link>
         </div>
       </main>
