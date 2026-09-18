@@ -1337,18 +1337,19 @@ Vendora`
   </>
 )} 
 
-            <label className="mb-2 block font-semibold">
-              Начин на плащане
-            </label>
-
+         <label className="mb-2 block font-semibold">
+  Payment method
+</label>
           <select
   value={paymentMethod}
   onChange={(e) => setPaymentMethod(e.target.value)}
   className="mb-6 w-full rounded-lg border p-3"
 >
-  {paymentSettings.cod && (
-    <option>Наложен платеж</option>
-  )}
+{paymentSettings.cod && (
+  <option value="Наложен платеж">
+    Cash on delivery
+  </option>
+)}
 
   {paymentSettings.stripe && (
     <option>Stripe</option>
@@ -1362,9 +1363,11 @@ Vendora`
     <option>Revolut</option>
   )}
 
-  {paymentSettings.bankTransfer && (
-    <option>Банков превод</option>
-  )}
+ {paymentSettings.bankTransfer && (
+  <option value="Банков превод">
+    Bank transfer
+  </option>
+)}
 </select> 
 
             <div className="flex gap-4">
@@ -1374,8 +1377,8 @@ Vendora`
                 className="flex-1 rounded-lg bg-green-600 py-4 text-white disabled:opacity-50"
               >
                 {isSubmitting
-                  ? "Изпращане..."
-                  : "Изпрати поръчката"}
+  ? "Submitting..."
+  : "Place order"}
               </button>
 
               <button
@@ -1383,7 +1386,7 @@ Vendora`
                 onClick={() => setShowCheckoutForm(false)}
                 className="rounded-lg bg-gray-300 px-6 py-4"
               >
-                Откажи
+                Cancel
               </button>
             </div>
 
