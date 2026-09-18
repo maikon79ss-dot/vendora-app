@@ -1247,20 +1247,20 @@ Vendora`
             className="mt-8 rounded-2xl bg-white p-8 shadow"
           >
             <h2 className="mb-6 text-3xl font-bold">
-              Данни за поръчката
+              Order details
             </h2>
 
             <input
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="Име и фамилия"
+              placeholder="Full name"
               className="mb-4 w-full rounded-lg border p-3"
             />
 
             <input
               value={customerEmail}
               onChange={(e) => setCustomerEmail(e.target.value)}
-              placeholder="Имейл"
+              placeholder="Email"
               type="email"
               className="mb-4 w-full rounded-lg border p-3"
             />
@@ -1268,11 +1268,11 @@ Vendora`
             <input
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
-              placeholder="Телефон"
+              placeholder="Phone"
               className="mb-4 w-full rounded-lg border p-3"
             />
 <label className="mb-2 block font-semibold">
-  Начин на доставка
+  Delivery method
 </label>
 
 <select
@@ -1288,9 +1288,13 @@ Vendora`
   }}
   className="mb-4 w-full rounded-lg border p-3"
 >
-  <option>Доставка до адрес</option>
+  <option value="Доставка до адрес">
+  Delivery to address
+</option>
   {econtEnabled && (
-  <option>Econt офис</option>
+  <option value="Econt офис">
+  Econt office
+</option>
 )}
 </select>
 
@@ -1298,12 +1302,13 @@ Vendora`
   <EcontDeliveryPicker
     ownerId={cartItems[0]?.ownerId}
     onChange={setEcontSelection}
+    language="en"
   />
 )}
 
 {deliveryMethod === "Econt офис" && econtSelection && (
   <p className="mb-4 mt-3 text-sm font-semibold text-green-700">
-    ✅ Избрана доставка: {econtSelection.cityName} →{" "}
+   ✅ Selected delivery:  {econtSelection.cityName} →{" "}
     {econtSelection.officeName}
   </p>
 )}
@@ -1312,21 +1317,21 @@ Vendora`
     <input
       value={address}
       onChange={(e) => setAddress(e.target.value)}
-      placeholder="Адрес"
+      placeholder="Address"
       className="mb-4 w-full rounded-lg border p-3"
     />
 
     <input
       value={city}
       onChange={(e) => setCity(e.target.value)}
-      placeholder="Град"
+      placeholder="City"
       className="mb-4 w-full rounded-lg border p-3"
     />
 
     <input
       value={postalCode}
       onChange={(e) => setPostalCode(e.target.value)}
-      placeholder="Пощенски код"
+      placeholder="Postal code"
       className="mb-4 w-full rounded-lg border p-3"
     />
   </>
