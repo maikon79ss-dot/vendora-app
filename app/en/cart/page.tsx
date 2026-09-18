@@ -777,26 +777,26 @@ if (paymentMethod === "Банков превод") {
     ownerId: cartItems[0]?.ownerId || "",
   });
 try {
-  await sendOrderEmail(
-    customerEmail,
-    "Данни за банков превод – Vendora",
-    `Здравейте, ${customerName}!
+await sendOrderEmail(
+  customerEmail,
+  "Bank transfer details – Vendora",
+  `Hello, ${customerName}!
 
-Благодарим за вашата поръчка.
+Thank you for your order.
 
-Номер на поръчката: ${checkoutId}
+Order number: ${checkoutId}
 
-Данни за банков превод:
-Получател: ${paymentLinks.bankHolder}
+Bank transfer details:
+Account holder: ${paymentLinks.bankHolder}
 IBAN: ${paymentLinks.bankIban}
-Банка: ${paymentLinks.bankName}
-Сума: ${finalTotal.toFixed(2)} €
+Bank: ${paymentLinks.bankName}
+Amount: ${finalTotal.toFixed(2)} €
 
-След получаване на плащането продавачът ще обработи поръчката ви.
+The seller will process your order after the payment has been received.
 
-Поздрави,
+Best regards,
 Vendora`
-  );
+);
 
   const sellerOwnerId = cartItems[0]?.ownerId;
 
