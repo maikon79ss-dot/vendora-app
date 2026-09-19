@@ -48,10 +48,11 @@ function CartPaymentSuccessContent() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              sessionId,
-              checkoutId,
-            }),
+          body: JSON.stringify({
+  sessionId,
+  checkoutId,
+  language: "en",
+}),
           }
         );
 
