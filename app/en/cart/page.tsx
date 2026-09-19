@@ -881,9 +881,9 @@ Vendora`
 } catch (emailError) {
   console.error(emailError);
 
-  setMessage(
-    "Поръчката е записана, но имейлът не беше изпратен."
-  );
+setMessage(
+  "The order was saved, but the confirmation email could not be sent."
+);
 }
   try {
   const sellerOwnerId = cartItems[0]?.ownerId;
