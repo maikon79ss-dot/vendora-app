@@ -20,6 +20,7 @@ type StoreCheckoutBody = {
   ownerId: string;
   items: CheckoutItem[];
   discountAmount?: number;
+  language?: "bg" | "en";
 };
 
 export async function POST(
@@ -77,13 +78,14 @@ export async function POST(
     const body =
       (await request.json()) as StoreCheckoutBody;
 
-    const {
-      checkoutId,
-      customerEmail,
-      ownerId,
-      items,
-      discountAmount = 0,
-    } = body;
+  const {
+  checkoutId,
+  customerEmail,
+  ownerId,
+  items,
+  discountAmount = 0,
+  language = "bg",
+} = body;
 
     if (
       !checkoutId ||
@@ -327,14 +329,23 @@ if (!storeSlug) {
             },
           },
 
-         success_url:
-  `${siteUrl}/cart/success?session_id={CHECKOUT_SESSION_ID}&checkout_id=${encodeURIComponent(
+   success_url:
+  `${siteUrl}${
+    language === "en"
+      ? "/en/cart/success"
+      : "/cart/success"
+  }?session_id={CHECKOUT_SESSION_ID}&checkout_id=${encodeURIComponent(
     checkoutId
   )}&store_slug=${encodeURIComponent(
     storeSlug
   )}`,
-          cancel_url:
-            `${siteUrl}/cart?payment=cancelled`,
+
+cancel_url:
+  `${siteUrl}${
+    language === "en"
+      ? "/en/cart"
+      : "/cart"
+  }?payment=cancelled`,
         },
         {
           stripeAccount:
