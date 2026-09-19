@@ -552,6 +552,7 @@ if (paymentMethod === "Stripe") {
           customerEmail,
           ownerId: ownerIds[0],
           discountAmount,
+          language: "en",
           items: cartItems.map((item) => ({
             productId: item.productId,
             name: item.name,
