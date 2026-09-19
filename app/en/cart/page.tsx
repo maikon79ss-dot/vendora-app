@@ -974,12 +974,12 @@ Vendora`
 {bankTransferInfo && (
   <div className="mx-auto mt-8 max-w-xl rounded-2xl border bg-blue-50 p-6 text-left">
     <h2 className="text-2xl font-bold">
-      Данни за банков превод
+      Bank transfer details
     </h2>
 
     <div className="mt-5 space-y-3">
       <p>
-        <strong>Получател:</strong>{" "}
+       <strong>Account holder:</strong> {" "}
         {bankTransferInfo.holder}
       </p>
 
@@ -989,31 +989,31 @@ Vendora`
       </p>
 
       <p>
-        <strong>Банка:</strong>{" "}
+        <strong>Bank:</strong>{" "}
         {bankTransferInfo.bankName}
       </p>
 
       <p>
-        <strong>Сума:</strong>{" "}
+      <strong>Amount:</strong>  {" "}
         {bankTransferInfo.amount.toFixed(2)} €
       </p>
 
       <p>
-        <strong>Основание:</strong>{" "}
-        Поръчка {bankTransferInfo.checkoutId}
+       <strong>Payment reference:</strong> {" "}
+        Order {bankTransferInfo.checkoutId}
       </p>
     </div>
 
     <p className="mt-5 text-sm text-gray-600">
-      Поръчката ще бъде обработена след потвърждение на превода от продавача.
+      The order will be processed after the seller confirms the payment.
     </p>
     <div className="mt-6 border-t pt-6">
   <h3 className="text-xl font-bold">
-    Вече направихте превода?
+    Have you already made the transfer?
   </h3>
 
   <p className="mt-2 text-sm text-gray-600">
-    Изпратете данните за превода на продавача за проверка.
+    Send the transfer details to the seller for verification.
   </p>
 
   <input
@@ -1022,12 +1022,12 @@ Vendora`
     onChange={(e) =>
       setTransferSenderName(e.target.value)
     }
-    placeholder="Име на наредителя"
+    placeholder="Sender name"
     className="mt-4 w-full rounded-lg border bg-white p-3"
   />
 
   <label className="mt-4 block text-sm font-semibold">
-    Дата на превода
+    Transfer date
   </label>
 
   <input
@@ -1045,7 +1045,7 @@ Vendora`
     onChange={(e) =>
       setTransferReference(e.target.value)
     }
-    placeholder="Референция / номер на транзакцията (по желание)"
+    placeholder="Reference / transaction number (optional)"
     className="mt-4 w-full rounded-lg border bg-white p-3"
   />
 
@@ -1059,10 +1059,10 @@ Vendora`
     className="mt-5 w-full rounded-lg bg-green-600 px-5 py-3 font-semibold text-white disabled:opacity-50"
   >
     {sendingTransferConfirmation
-      ? "Изпращане..."
+      ? "Sending..."
       : transferConfirmationSent
-      ? "✅ Потвърждението е изпратено"
-      : "Изпрати потвърждение за плащане"}
+      ? "✅ Confirmation sent"
+      : "Send payment confirmation"}
   </button>
 </div>
   </div>
