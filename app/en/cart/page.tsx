@@ -849,8 +849,8 @@ Vendora`
   setCouponCode("");
   setAppliedCoupon("");
   setDiscountAmount(0);
- setMessage(
-  "🏦 Очакваме банковия превод. След потвърждение поръчката ще бъде обработена."
+setMessage(
+  "🏦 We are awaiting your bank transfer. The order will be processed after confirmation."
 );
   setIsSubmitting(false);
   return;
