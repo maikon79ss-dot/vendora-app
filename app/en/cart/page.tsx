@@ -1123,9 +1123,9 @@ Vendora`
               <div>
                 <h2 className="text-2xl font-bold">{item.name}</h2>
 
-                <p className="mt-2 text-gray-600">
-                  Variant: {item.variant}
-                </p>
+              <p className="mt-2 text-gray-600">
+  Variant: {item.variant === "Стандартен" ? "Standard" : item.variant}
+</p>
 
                 <p className="mt-2 text-xl font-semibold text-blue-600">
                   {item.price.toFixed(2)} €
