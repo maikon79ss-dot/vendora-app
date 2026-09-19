@@ -262,9 +262,9 @@ async function sendOrderEmail(
   if (!bankTransferInfo) return;
 
   if (!transferSenderName.trim() || !transferDate) {
-    setMessage(
-      "Моля, попълнете име на наредителя и дата на превода."
-    );
+  setMessage(
+  "Please enter the sender name and transfer date."
+);
     return;
   }
 
@@ -306,18 +306,18 @@ Vendora`
     );
 
     setTransferConfirmationSent(true);
-    setMessage(
-      "✅ Потвърждението за банковия превод беше изпратено на продавача."
-    );
+  setMessage(
+  "✅ The bank transfer confirmation was sent to the seller."
+);
   } catch (error) {
     console.error(
       "Грешка при потвърждението на банковия превод:",
       error
     );
 
-    setMessage(
-      "❌ Потвърждението не можа да бъде изпратено."
-    );
+  setMessage(
+  "❌ The confirmation could not be sent."
+);
   }
 
   setSendingTransferConfirmation(false);
