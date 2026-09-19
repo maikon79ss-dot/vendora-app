@@ -573,10 +573,13 @@ if (paymentMethod === "Stripe") {
         result
       );
 
-      setMessage(
-       result.error ||
-  "Stripe checkout could not be created."
-      );
+    setMessage(
+  result.error ===
+    "Stripe акаунтът на продавача още не е готов да приема плащания."
+    ? "The seller's Stripe account is not yet ready to accept payments."
+    : result.error ||
+      "Stripe checkout could not be created."
+);
 
       setIsSubmitting(false);
       return;
