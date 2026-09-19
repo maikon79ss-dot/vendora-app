@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 type ConfirmPaymentBody = {
   sessionId?: string;
   checkoutId?: string;
+  language?: "bg" | "en";
 };
 
 export async function POST(
@@ -71,7 +72,10 @@ export async function POST(
 
     const checkoutId =
       body.checkoutId?.trim();
-
+const language =
+  body.language === "en"
+    ? "en"
+    : "bg";
     if (!sessionId || !checkoutId) {
       return NextResponse.json(
         {
@@ -286,10 +290,30 @@ export async function POST(
                 to: firstOrder
                   .customer_email,
 
-                subject:
-                  "Потвърждение за платена поръчка",
+   subject:
+  language === "en"
+    ? "Payment confirmation – Vendora"
+    : "Потвърждение за платена поръчка",
 
-                message: `Здравейте, ${firstOrder.customer_name}!
+message:
+  language === "en"
+    ? `Hello, ${firstOrder.customer_name}!
+
+Your payment has been confirmed successfully.
+
+Order number: ${checkoutId}
+
+Products:
+${products}
+
+Total: ${total.toFixed(2)} €
+Payment method: Stripe
+
+The seller will process your order.
+
+Best regards,
+Vendora`
+    : `Здравейте, ${firstOrder.customer_name}!
 
 Вашето плащане беше потвърдено успешно.
 
