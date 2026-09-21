@@ -112,8 +112,9 @@ export default function PlanPageEn() {
               `Bearer ${session.access_token}`,
           },
           body: JSON.stringify({
-            plan,
-          }),
+  plan,
+  language: "en",
+}),
         }
       );
 
