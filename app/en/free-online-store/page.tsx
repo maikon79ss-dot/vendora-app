@@ -233,12 +233,12 @@ export default function FreeOnlineStorePageEn() {
               Start for free
             </Link>
 
-            <Link
-              href="/en"
-              className="rounded-xl border border-white/20 px-8 py-4 font-bold transition hover:bg-white/10"
-            >
-              Learn more about Vendora
-            </Link>
+           <Link
+  href="/en/create-online-store"
+  className="rounded-xl border border-white/20 px-8 py-4 font-bold transition hover:bg-white/10"
+>
+  How to create an online store
+</Link>
           </div>
         </div>
       </section>
