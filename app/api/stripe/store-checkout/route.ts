@@ -98,30 +98,32 @@ export async function POST(
       !customerEmail ||
       !ownerId
     ) {
-      return NextResponse.json(
-        {
-      error: getStripeMessage(
-  language,
-  "Липсват данни за поръчката.",
-  "Order information is missing."
-),
-        { status: 400 }
-      );
+return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Липсват данни за поръчката.",
+      "Order information is missing."
+    ),
+  },
+  { status: 400 }
+);
     }
 
     if (
       !Array.isArray(items) ||
       items.length === 0
     ) {
-      return NextResponse.json(
-        {
-       error: getStripeMessage(
-  language,
-  "Количката е празна.",
-  "Your cart is empty."
-),
-        { status: 400 }
-      );
+return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Количката е празна.",
+      "Your cart is empty."
+    ),
+  },
+  { status: 400 }
+);
     }
 
     const hasDifferentOwner =
@@ -131,15 +133,16 @@ export async function POST(
       );
 
     if (hasDifferentOwner) {
-      return NextResponse.json(
-        {
-       error: getStripeMessage(
-  language,
-  "Stripe плащането може да съдържа продукти само от един магазин.",
-  "Stripe checkout can only contain products from one store."
-),
-        { status: 400 }
-      );
+return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Stripe плащането може да съдържа продукти само от един магазин.",
+      "Stripe checkout can only contain products from one store."
+    ),
+  },
+  { status: 400 }
+);
     }
 
     const {
@@ -169,41 +172,44 @@ export async function POST(
         sellerError
       );
 
-      return NextResponse.json(
-        {
-      error: getStripeMessage(
-  language,
-  "Профилът на продавача не беше намерен.",
-  "The seller profile could not be found."
-),
-        { status: 404 }
-      );
+  return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Профилът на продавача не беше намерен.",
+      "The seller profile could not be found."
+    ),
+  },
+  { status: 404 }
+);
     }
 const storeSlug = seller.store_slug;
 
 if (!storeSlug) {
-  return NextResponse.json(
-    {
- error: getStripeMessage(
-  language,
-  "Магазинът на продавача няма валиден адрес.",
-  "The seller's store does not have a valid address."
-),
-    { status: 400 }
-  );
+return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Магазинът на продавача няма валиден адрес.",
+      "The seller's store does not have a valid address."
+    ),
+  },
+  { status: 400 }
+);
 }
     if (
       !seller.stripe_account_id
     ) {
-      return NextResponse.json(
-        {
-      error: getStripeMessage(
-  language,
-  "Продавачът още не е свързал Stripe акаунт.",
-  "The seller has not connected a Stripe account yet."
-), 
-        { status: 400 }
-      );
+ return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Продавачът още не е свързал Stripe акаунт.",
+      "The seller has not connected a Stripe account yet."
+    ),
+  },
+  { status: 400 }
+);
     }
 
     const connectedAccount =
@@ -215,15 +221,16 @@ if (!storeSlug) {
       !connectedAccount.charges_enabled ||
       !connectedAccount.details_submitted
     ) {
-      return NextResponse.json(
-        {
-       error: getStripeMessage(
-  language,
-  "Stripe акаунтът на продавача още не е готов да приема плащания.",
-  "The seller's Stripe account is not yet ready to accept payments."
-),
-        { status: 400 }
-      );
+return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Stripe акаунтът на продавача още не е готов да приема плащания.",
+      "The seller's Stripe account is not yet ready to accept payments."
+    ),
+  },
+  { status: 400 }
+);
     }
 
     const originalTotal =
@@ -374,15 +381,16 @@ cancel_url:
       );
 
     if (!checkoutSession.url) {
-      return NextResponse.json(
-        {
-       error: getStripeMessage(
-  language,
-  "Stripe не върна адрес за плащане.",
-  "Stripe did not return a payment URL."
-),
-        { status: 500 }
-      );
+   return NextResponse.json(
+  {
+    error: getStripeMessage(
+      language,
+      "Stripe не върна адрес за плащане.",
+      "Stripe did not return a payment URL."
+    ),
+  },
+  { status: 500 }
+);
     }
 
     return NextResponse.json({
