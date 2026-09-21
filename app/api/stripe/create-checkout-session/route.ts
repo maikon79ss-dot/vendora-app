@@ -96,14 +96,18 @@ export async function POST(
       );
     }
 
-    const body =
-      (await request.json()) as {
-        plan?: string;
-      };
+  const body =
+  (await request.json()) as {
+    plan?: string;
+    language?: "bg" | "en";
+  };
 
     const plan =
       body.plan;
-
+const language =
+  body.language === "en"
+    ? "en"
+    : "bg";
     if (
       plan !== "premium_monthly" &&
       plan !== "premium_yearly"
@@ -190,14 +194,22 @@ export async function POST(
           },
         },
 
-        success_url:
-          `${siteUrl}/plan/success?session_id={CHECKOUT_SESSION_ID}`,
+   success_url:
+  `${siteUrl}${
+    language === "en"
+      ? "/en/plan/success"
+      : "/plan/success"
+  }?session_id={CHECKOUT_SESSION_ID}`,
 
-        cancel_url:
-          `${siteUrl}/plan`,
-      });
+cancel_url:
+  `${siteUrl}${
+    language === "en"
+      ? "/en/plan"
+      : "/plan"
+  }`,
+});
 
-    if (!checkoutSession.url) {
+if (!checkoutSession.url) {
       return NextResponse.json(
         {
           error:
