@@ -50,6 +50,13 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 0.9,
   },
   {
+  url: `${baseUrl}/en/how-to-sell-online`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.9,
+},
+
+  {
     url: `${baseUrl}/plan`,
     lastModified: new Date(),
     changeFrequency: "weekly",
