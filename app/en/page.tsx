@@ -175,7 +175,7 @@ export default function HomeEn() {
               </Link>
 
               <Link
-                href="/store/demo"
+                href="/en/store/demo"
                 className="rounded-xl border border-white/20 bg-white/5 px-7 py-4 text-center text-base font-bold transition hover:bg-white/10"
               >
                 View demo store
