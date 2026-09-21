@@ -38,12 +38,10 @@ ${message}`,
         }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        setNotice(result.error || "The email was not sent.");
-        return;
-      }
+   if (!response.ok) {
+  setNotice("The email was not sent.");
+  return;
+}
 
       setNotice("✅ Your message was sent successfully.");
 
