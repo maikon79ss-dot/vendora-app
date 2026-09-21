@@ -26,6 +26,18 @@ const staticPages: MetadataRoute.Sitemap = [
     priority: 0.9,
   },
   {
+  url: `${baseUrl}/en/create-online-store`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.9,
+},
+  {
+  url: `${baseUrl}/en/free-online-store`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.9,
+},
+  {
     url: `${baseUrl}/bezplaten-online-magazin`,
     lastModified: new Date(),
     changeFrequency: "weekly",
