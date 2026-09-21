@@ -95,10 +95,10 @@ export default function RegisterPageEn() {
           <p className="text-sm text-gray-500">
             Your store URL will be:
             <br />
-            <strong>
-              {(process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "")}
-              /store/{slug || "your-page"}
-            </strong>
+           <strong>
+  {(process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, "")}
+  /en/store/{slug || "your-page"}
+</strong>
           </p>
 
           <button
