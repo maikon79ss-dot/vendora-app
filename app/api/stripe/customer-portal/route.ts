@@ -9,6 +9,10 @@ export async function POST(
   request: NextRequest
 ) {
   try {
+        const language =
+      request.headers.get("x-vendora-language") === "en"
+        ? "en"
+        : "bg";
     const stripeSecretKey =
       process.env.STRIPE_SECRET_KEY;
 
@@ -159,8 +163,12 @@ export async function POST(
         customer:
           profile.stripe_customer_id,
 
-        return_url:
-          `${siteUrl}/plan`,
+      return_url:
+  `${siteUrl}${
+    language === "en"
+      ? "/en/plan"
+      : "/plan"
+  }`,
       });
 
     return NextResponse.json({
