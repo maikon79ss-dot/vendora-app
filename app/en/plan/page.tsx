@@ -165,10 +165,11 @@ export default function PlanPageEn() {
         "/api/stripe/customer-portal",
         {
           method: "POST",
-          headers: {
-            Authorization:
-              `Bearer ${session.access_token}`,
-          },
+       headers: {
+  Authorization:
+    `Bearer ${session.access_token}`,
+  "x-vendora-language": "en",
+},
         }
       );
 
