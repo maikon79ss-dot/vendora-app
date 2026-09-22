@@ -98,17 +98,33 @@ const staticPages: MetadataRoute.Sitemap = [
     .select("store_slug")
     .not("store_slug", "is", null);
 
-  const storePages: MetadataRoute.Sitemap =
-    (profiles || [])
-      .filter((profile) => profile.store_slug)
-      .map((profile) => ({
-        url: `${baseUrl}/store/${encodeURIComponent(
-          profile.store_slug
-        )}`,
-        lastModified: new Date(),
-        changeFrequency: "daily",
-        priority: 0.8,
-      }));
+const storePages: MetadataRoute.Sitemap =
+  (profiles || [])
+    .filter((profile) => profile.store_slug)
+    .map((profile) => ({
+      url: `${baseUrl}/store/${encodeURIComponent(
+        profile.store_slug
+      )}`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.8,
+    }));
 
-  return [...staticPages, ...storePages];
+const englishStorePages: MetadataRoute.Sitemap =
+  (profiles || [])
+    .filter((profile) => profile.store_slug)
+    .map((profile) => ({
+      url: `${baseUrl}/en/store/${encodeURIComponent(
+        profile.store_slug
+      )}`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.8,
+    }));
+
+return [
+  ...staticPages,
+  ...storePages,
+  ...englishStorePages,
+];
 }
