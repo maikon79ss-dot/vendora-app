@@ -500,12 +500,13 @@ quantity: item.quantity,
       variant: item.variant,
       payment_method: paymentMethod,
       total_price: Number(itemFinalPrice.toFixed(2)),
-      created_checkout_at: checkoutCreatedAt,
-      status:
+  created_checkout_at: checkoutCreatedAt,
+status:
   paymentMethod === "Stripe"
     ? "Очаква плащане"
     : "Нова",
-      stock_updated: false,
+language: "en",
+stock_updated: false,
     };
   });
 
