@@ -89,10 +89,10 @@ useEffect(() => {
       data: { session },
     } = await supabase.auth.getSession();
 
-    if (!session) {
-      router.push("/login");
-      return;
-    }
+ if (!session) {
+  router.push("/en/login");
+  return;
+}
 
     const { data, error } = await supabase
       .from("orders")
@@ -278,9 +278,9 @@ await sendStatusEmail(
 
   try {
     await navigator.clipboard.writeText(address);
-    alert("✅ Адресът е копиран.");
+    alert("✅ Address copied.");
   } catch {
-    alert("❌ Неуспешно копиране.");
+    alert("❌ Copy failed.");
   }
 }
 async function validateEcontShipment(
@@ -296,7 +296,7 @@ async function validateEcontShipment(
 
   if (!firstOrder.checkout_id) {
     alert(
-      "Липсва номер на поръчката за Econt проверка."
+      "Order number is missing for the Econt check."
     );
     return;
   }
@@ -307,14 +307,14 @@ async function validateEcontShipment(
     )
   ) {
     alert(
-      "Тази поръчка не е за доставка до офис на Econt."
+      "This order is not for delivery to an Econt office."
     );
     return;
   }
 
   if (!firstOrder.econt_office_code) {
     alert(
-      "Липсва Econt код на офиса на получателя."
+      "The recipient's Econt office code is missing."
     );
     return;
   }
@@ -335,7 +335,7 @@ async function validateEcontShipment(
     weight <= 0
   ) {
     alert(
-      "Въведете валидно тегло на пратката."
+      "Enter a valid shipment weight."
     );
     return;
   }
@@ -345,7 +345,7 @@ async function validateEcontShipment(
     packCount <= 0
   ) {
     alert(
-      "Броят пакети трябва да бъде положително цяло число."
+      "The number of packages must be a positive whole number."
     );
     return;
   }
@@ -357,7 +357,7 @@ async function validateEcontShipment(
 
   if (sessionError || !session) {
     alert(
-      "Неуспешна проверка на потребителската сесия."
+      "Unable to verify the user session."
     );
     return;
   }
@@ -399,49 +399,48 @@ async function validateEcontShipment(
       !response.ok ||
       !result?.ok
     ) {
-      alert(
-        result?.error ||
-          "Econt пратката не можа да бъде проверена."
-      );
+     alert(
+  "The Econt shipment could not be checked."
+);
       return;
     }
 
     const validation =
       result.validation || {};
 
-    const messageLines = [
-      "✅ Econt прие данните за пратката.",
-      "",
-      `Тегло: ${validation.weight ?? weight} кг`,
-      `Брой пакети: ${
-        validation.packCount ?? packCount
-      }`,
-      `Econt офис: ${
-        validation.receiverOfficeCode ||
-        firstOrder.econt_office_code
-      }`,
-    ];
+  const messageLines = [
+  "✅ Econt accepted the shipment details.",
+  "",
+  `Weight: ${validation.weight ?? weight} kg`,
+  `Number of packages: ${
+    validation.packCount ?? packCount
+  }`,
+  `Econt office: ${
+    validation.receiverOfficeCode ||
+    firstOrder.econt_office_code
+  }`,
+];
 
     if (
       validation.totalPrice !== null &&
       validation.totalPrice !== undefined
     ) {
       messageLines.push(
-        `Цена за доставка: ${validation.totalPrice} ${
-          validation.currency || ""
-        }`
+       `Delivery price: ${validation.totalPrice} ${
+  validation.currency || ""
+}` 
       );
     }
 
     if (validation.expectedDeliveryDate) {
       messageLines.push(
-        `Очаквана доставка: ${validation.expectedDeliveryDate}`
+        `Expected delivery: ${validation.expectedDeliveryDate}`
       );
     }
 
     if (validation.warnings) {
       messageLines.push(
-        `Предупреждение: ${
+        `Warning: ${
           typeof validation.warnings ===
           "string"
             ? validation.warnings
@@ -460,7 +459,7 @@ async function validateEcontShipment(
     );
 
     alert(
-      "Възникна грешка при проверката на Econt пратката."
+      "An error occurred while checking the Econt shipment."
     );
   } finally {
     setEcontValidating((current) => ({
@@ -482,7 +481,7 @@ async function validateEcontShipment(
 
   if (!firstOrder.checkout_id) {
     alert(
-      "Липсва номер на поръчката за Econt товарителница."
+      "Order number is missing for the Econt shipping label."
     );
     return;
   }
@@ -537,7 +536,7 @@ async function validateEcontShipment(
   }
 
   const confirmed = window.confirm(
-    "Това ще създаде реална Econt товарителница. Продължавате ли?"
+    "This will create a real Econt shipping label. Do you want to continue?"
   );
 
   if (!confirmed) {
@@ -593,10 +592,9 @@ async function validateEcontShipment(
       !response.ok ||
       !result?.ok
     ) {
-      alert(
-        result?.error ||
-          "Econt товарителницата не можа да бъде създадена."
-      );
+    alert(
+  "The Econt shipping label could not be created."
+);
       return;
     }
 
@@ -605,13 +603,13 @@ async function validateEcontShipment(
 
     const messageLines = [
       result.alreadyCreated
-        ? "ℹ️ За тази поръчка вече има Econt товарителница."
-        : "✅ Econt товарителницата е създадена успешно.",
+        ? "ℹ️ An Econt shipping label already exists for this order."
+        : "✅ The Econt shipping label was created successfully.",
       "",
-      `Номер: ${
-        shipment.shipmentNumber ||
-        "Няма върнат номер"
-      }`,
+      `Number: ${
+  shipment.shipmentNumber ||
+  "No number returned"
+}`,
     ];
 
     if (
@@ -619,16 +617,16 @@ async function validateEcontShipment(
       shipment.totalPrice !== undefined
     ) {
       messageLines.push(
-        `Цена за доставка: ${shipment.totalPrice} ${
-          shipment.currency || ""
-        }`
+       `Delivery price: ${shipment.totalPrice} ${
+  shipment.currency || ""
+}`
       );
     }
 
     if (result.warning) {
       messageLines.push(
         "",
-        `Предупреждение: ${result.warning}`
+        `Warning: ${result.warning}`
       );
     }
 
@@ -642,7 +640,7 @@ async function validateEcontShipment(
     );
 
     alert(
-      "Възникна грешка при създаването на Econt товарителницата."
+      "An error occurred while creating the Econt shipping label."
     );
   } finally {
     setEcontCreating((current) => ({
@@ -752,19 +750,22 @@ function generateOrderPDF(orderGroup: Order[]) {
   );
 }
 
-  return (
-    <main className="min-h-screen bg-gray-100 p-10">
-      <h1 className="text-4xl font-bold mb-8">Поръчки</h1>
+ return (
+  <main
+    lang="en"
+    className="min-h-screen bg-gray-100 p-10"
+  >
+    <h1 className="text-4xl font-bold mb-8">Orders</h1>
 <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
   <div className="rounded-xl bg-white p-5 shadow">
-    <p className="text-sm text-gray-500">Общо поръчки</p>
+    <p className="text-sm text-gray-500">Total orders</p>
     <p className="mt-2 text-3xl font-bold">
       {groupedOrders.length}
     </p>
   </div>
 
   <div className="rounded-xl bg-white p-5 shadow">
-    <p className="text-sm text-gray-500">Нови</p>
+    <p className="text-sm text-gray-500">New</p>
     <p className="mt-2 text-3xl font-bold">
       {
         groupedOrders.filter(
@@ -775,7 +776,7 @@ function generateOrderPDF(orderGroup: Order[]) {
   </div>
 
   <div className="rounded-xl bg-white p-5 shadow">
-    <p className="text-sm text-gray-500">Изпратени</p>
+    <p className="text-sm text-gray-500">Shipped</p>
     <p className="mt-2 text-3xl font-bold">
       {
         groupedOrders.filter(
@@ -786,7 +787,7 @@ function generateOrderPDF(orderGroup: Order[]) {
   </div>
 
   <div className="rounded-xl bg-white p-5 shadow">
-    <p className="text-sm text-gray-500">Общ оборот</p>
+    <p className="text-sm text-gray-500">Total revenue</p>
     <p className="mt-2 text-3xl font-bold">
       {orders
         .reduce(
@@ -802,7 +803,7 @@ function generateOrderPDF(orderGroup: Order[]) {
     <div className="mb-6 flex flex-col gap-4 md:flex-row">
   <input
     type="text"
-    placeholder="🔍 Търси по име, имейл или телефон..."
+    placeholder="🔍 Search by name, email or phone..."
     value={searchTerm}
     onChange={(e) => setSearchTerm(e.target.value)}
     className="w-full rounded-xl border border-gray-300 px-4 py-3"
@@ -813,16 +814,16 @@ function generateOrderPDF(orderGroup: Order[]) {
   onChange={(e) => setStatusFilter(e.target.value)}
   className="rounded-xl border border-gray-300 px-4 py-3 md:w-64"
 >
-  <option>Всички</option>
-  <option>Нова</option>
-  <option>Обработва се</option>
-  <option>Изпратена</option>
-  <option>Доставена</option>
-  <option>Отказана</option>
+<option value="Всички">All</option>
+<option value="Нова">New</option>
+<option value="Обработва се">Processing</option>
+<option value="Изпратена">Shipped</option>
+<option value="Доставена">Delivered</option>
+<option value="Отказана">Cancelled</option>
 </select>
       {orders.length === 0 && (
 
-        <p className="text-gray-600">Все още няма поръчки.</p>
+        <p className="text-gray-600">There are no orders yet.</p>
       )}
 
       <div className="grid gap-8">
@@ -849,7 +850,7 @@ const orderKey =
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
   <h2 className="text-2xl font-bold">
-  📦 Поръчка #
+  📦 Order #
   {(firstOrder.checkout_id || String(firstOrder.id))
     .slice(0, 8)
     .toUpperCase()}
@@ -869,7 +870,17 @@ const orderKey =
         : "bg-red-100 text-red-800"
     }`}
   >
-    {firstOrder.status}
+    {firstOrder.status === "Нова"
+  ? "New"
+  : firstOrder.status === "Обработва се"
+  ? "Processing"
+  : firstOrder.status === "Изпратена"
+  ? "Shipped"
+  : firstOrder.status === "Доставена"
+  ? "Delivered"
+  : firstOrder.status === "Отказана"
+  ? "Cancelled"
+  : firstOrder.status}
   </span>
 </div>
 
@@ -887,19 +898,19 @@ const orderKey =
     onClick={() => copyAddress(firstOrder)}
     className="mt-2 rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
   >
-    📋 Копирай адрес
+    📋 Copy address
   </button>
  {firstOrder.address?.startsWith(
   "Econt офис:"
 ) && (
   <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
     <p className="font-bold text-green-800">
-      📦 Econt проверка на пратката
+      📦 Econt shipment check
     </p>
 
     <div className="mt-3 grid gap-3 sm:grid-cols-2">
       <label className="text-sm font-semibold">
-        Тегло (кг)
+        Weight (kg)
 
         <input
           type="text"
@@ -916,13 +927,13 @@ const orderKey =
               })
             )
           }
-          placeholder="Напр. 1.5"
+          placeholder="e.g. 1.5"
           className="mt-1 w-full rounded-lg border bg-white p-2"
         />
       </label>
 
       <label className="text-sm font-semibold">
-        Брой пакети
+        Number of packages
 
         <input
           type="number"
@@ -961,17 +972,17 @@ const orderKey =
       className="mt-3 rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
     >
       {econtValidating[orderKey]
-        ? "Проверяване..."
-        : "📦 Провери пратката"}
+        ? "Checking..."
+        : "📦 Check shipment"}
     </button>
 
     <p className="mt-2 text-xs text-green-800">
-      Тази проверка не създава
-      товарителница.
+    This check does not create
+a shipping label.
     </p>
     {firstOrder.tracking_number && (
   <p className="mt-3 text-sm font-semibold text-green-900">
-    ✅ Товарителница:{" "}
+   ✅ Shipping label:{" "}
     {firstOrder.tracking_number}
   </p>
 )}
@@ -991,15 +1002,15 @@ const orderKey =
   className="mt-3 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800 disabled:opacity-50"
 >
   {firstOrder.tracking_number
-    ? "✅ Товарителницата е създадена"
+    ? "✅ Shipping label created"
     : econtCreating[orderKey]
-    ? "Създаване..."
-    : "📦 Създай товарителница"}
+    ? "Creating..."
+    : "📦 Create shipping label"}
 </button>
 
 <p className="mt-2 text-xs font-semibold text-red-700">
-  Този бутон създава реална Econt
-  товарителница.
+ This button creates a real Econt
+shipping label.
 </p>
   </div>
 )}          
@@ -1009,17 +1020,17 @@ const orderKey =
               📅{" "}
               {new Date(
                 firstOrder.created_checkout_at || firstOrder.created_at
-              ).toLocaleString("bg-BG")}
+              ).toLocaleString("en-GB")}
             </p>
           </div>
 
           <div className="rounded-xl bg-gray-100 px-5 py-4 text-right">
-            <p className="text-sm text-gray-600">Обща сума</p>
+            <p className="text-sm text-gray-600">Total amount</p>
             <p className="text-3xl font-bold text-blue-600">
               {groupTotal.toFixed(2)} €
             </p>
             <p className="mt-1 text-sm text-gray-600">
-              Общо бройки: {totalQuantity}
+              Total quantity: {totalQuantity}
             </p>
           </div>
         </div>
@@ -1028,10 +1039,10 @@ const orderKey =
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b text-left">
-                <th className="py-3">Продукт</th>
-                <th className="py-3">Вариант</th>
-                <th className="py-3">Количество</th>
-                <th className="py-3">Сума</th>
+                <th className="py-3">Product</th>
+                <th className="py-3">Variant</th>
+                <th className="py-3">Quantity</th>
+                <th className="py-3">Amount</th>
               </tr>
             </thead>
 
