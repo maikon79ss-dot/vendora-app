@@ -24,9 +24,10 @@ quantity: number;
   payment_method: string;
   total_price: number;
   created_checkout_at: string;
-  status: string;
-  stock_updated: boolean;
-  created_at: string;
+ status: string;
+stock_updated: boolean;
+created_at: string;
+language?: string;
 };
 
 export default function OrdersPage() {
@@ -110,8 +111,25 @@ async function sendStatusEmail(
   customerEmail: string,
   customerName: string,
   productName: string,
-  newStatus: string
+  newStatus: string,
+  language?: string
 ) {
+  const isEnglish = language === "en";
+
+  const statusLabel = isEnglish
+    ? newStatus === "Нова"
+      ? "New"
+      : newStatus === "Обработва се"
+      ? "Processing"
+      : newStatus === "Изпратена"
+      ? "Shipped"
+      : newStatus === "Доставена"
+      ? "Delivered"
+      : newStatus === "Отказана"
+      ? "Cancelled"
+      : newStatus
+    : newStatus;
+
   const response = await fetch("/api/send-order-email", {
     method: "POST",
     headers: {
@@ -119,13 +137,26 @@ async function sendStatusEmail(
     },
     body: JSON.stringify({
       to: customerEmail,
-      subject: "Промяна в статуса на поръчката",
-      title: "Статусът на поръчката е променен",
-      message: `Здравейте, ${customerName}!
+      subject: isEnglish
+        ? "Your order status has changed"
+        : "Промяна в статуса на поръчката",
+      title: isEnglish
+        ? "Your order status has changed"
+        : "Статусът на поръчката е променен",
+      message: isEnglish
+        ? `Hello, ${customerName}!
+
+The status of your order for ${productName} is now:
+
+${statusLabel}
+
+Best regards,
+Vendora`
+        : `Здравейте, ${customerName}!
 
 Статусът на вашата поръчка за ${productName} вече е:
 
-${newStatus}
+${statusLabel}
 
 Поздрави,
 Vendora`,
@@ -136,11 +167,14 @@ Vendora`,
 
   if (!response.ok) {
     throw new Error(
-      result.error || "Имейлът за статуса не беше изпратен."
+      result.error ||
+        (isEnglish
+          ? "The status email could not be sent."
+          : "Имейлът за статуса не беше изпратен.")
     );
   }
 
-  console.log("Имейлът за статуса е изпратен:", result);
+  console.log("Order status email sent:", result);
 }
  async function updateOrderStatus(orderId: number, newStatus: string) {
   const order = orders.find((o) => o.id === orderId);
@@ -203,11 +237,12 @@ Vendora`,
           : currentOrder
       )
     );
-    await sendStatusEmail(
+await sendStatusEmail(
   order.customer_email,
   order.customer_name,
   order.product_name,
-  newStatus
+  newStatus,
+  order.language
 );
   return;
   }
@@ -230,11 +265,12 @@ Vendora`,
         : currentOrder
     )
   );
-  await sendStatusEmail(
+await sendStatusEmail(
   order.customer_email,
   order.customer_name,
   order.product_name,
-  newStatus
+  newStatus,
+  order.language
 );
 }
  async function copyAddress(order: Order) {
