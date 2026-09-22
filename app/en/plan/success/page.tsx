@@ -168,12 +168,12 @@ function PaymentSuccessContent() {
 
         {status !== "loading" && (
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link
-              href="/en/plan"
-              className="rounded-xl bg-blue-600 px-7 py-4 font-semibold text-white"
-            >
-              View plans
-            </Link>
+           <Link
+  href="/en/payments"
+  className="rounded-xl bg-blue-600 px-7 py-4 font-semibold text-white"
+>
+  View payments
+</Link>
 
             <Link
               href="/dashboard"
