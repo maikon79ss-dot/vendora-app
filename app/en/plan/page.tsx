@@ -120,13 +120,12 @@ export default function PlanPageEn() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setMessage(
-          data.error ||
-            "Unable to create the payment."
-        );
-        return;
-      }
+     if (!response.ok) {
+  setMessage(
+    "Unable to create the payment."
+  );
+  return;
+}
 
       if (!data.url) {
         setMessage(
@@ -175,13 +174,12 @@ export default function PlanPageEn() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        setMessage(
-          data.error ||
-            "Unable to open your subscription."
-        );
-        return;
-      }
+    if (!response.ok) {
+  setMessage(
+    "Unable to open your subscription."
+  );
+  return;
+}
 
       if (!data.url) {
         setMessage(
