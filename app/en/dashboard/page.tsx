@@ -399,8 +399,10 @@ export default function DashboardPage() {
                           }
                         >
                           {order.status === "Нова"
-                            ? "New"
-                            : order.status === "Обработва се"
+  ? "New"
+  : order.status === "Очаква плащане"
+  ? "Awaiting payment"
+  : order.status === "Обработва се"
                             ? "Processing"
                             : order.status === "Изпратена"
                             ? "Shipped"
