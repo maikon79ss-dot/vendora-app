@@ -244,7 +244,7 @@ export default function DashboardPage() {
             </p>
 
             <p>
-              <Link href="/dashboard/customers">👥 Customers</Link>
+              <Link href="/en/dashboard/customers">👥 Customers</Link>
             </p>
 
             <p>
