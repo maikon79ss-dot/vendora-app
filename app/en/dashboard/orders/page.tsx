@@ -720,7 +720,9 @@ function generateOrderPDF(orderGroup: Order[]) {
 
     body: orderGroup.map((order) => [
       order.product_name,
-      order.variant || "Standard",
+      order.variant === "Стандартен" || !order.variant
+  ? "Standard"
+  : order.variant,
       String(order.quantity),
       `${Number(
         order.total_price || 0
