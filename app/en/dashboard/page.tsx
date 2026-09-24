@@ -248,7 +248,7 @@ export default function DashboardPage() {
             </p>
 
             <p>
-              <Link href="/dashboard/coupons">🎟 Coupons</Link>
+              <Link href="/en/dashboard/coupons">🎟 Coupons</Link>
             </p>
 
             <p>
