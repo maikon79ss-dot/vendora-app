@@ -492,14 +492,14 @@ async function validateEcontShipment(
     )
   ) {
     alert(
-      "Тази поръчка не е за доставка до офис на Econt."
+      "This order is not for delivery to an Econt office."
     );
     return;
   }
 
   if (!firstOrder.econt_office_code) {
     alert(
-      "Липсва Econt код на офиса на получателя."
+      "The recipient's Econt office code is missing."
     );
     return;
   }
@@ -520,7 +520,7 @@ async function validateEcontShipment(
     weight <= 0
   ) {
     alert(
-      "Въведете валидно тегло на пратката."
+      "Enter a valid shipment weight."
     );
     return;
   }
@@ -530,7 +530,7 @@ async function validateEcontShipment(
     packCount <= 0
   ) {
     alert(
-      "Броят пакети трябва да бъде положително цяло число."
+      "The number of packages must be a positive whole number."
     );
     return;
   }
@@ -550,7 +550,7 @@ async function validateEcontShipment(
 
   if (sessionError || !session) {
     alert(
-      "Неуспешна проверка на потребителската сесия."
+      "Unable to verify the user session."
     );
     return;
   }
