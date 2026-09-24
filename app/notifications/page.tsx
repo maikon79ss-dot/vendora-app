@@ -13,6 +13,7 @@ type NotificationTemplate = {
   id?: number;
   user_id: string;
   type: TemplateType;
+  language: "bg" | "en";
   subject: string;
   body: string;
 };
@@ -156,10 +157,11 @@ async function loadTemplate(type: TemplateType) {
 
   const { data, error } = await supabase
     .from("notification_templates")
-    .select("id, user_id, type, subject, body")
-    .eq("user_id", userId)
-    .eq("type", type)
-    .maybeSingle();
+   .select("id, user_id, type, language, subject, body")
+.eq("user_id", userId)
+.eq("type", type)
+.eq("language", "bg")
+.maybeSingle();
 
   if (error) {
     console.error(error);
@@ -225,17 +227,18 @@ async function saveTemplate() {
   setTemplateSaving(true);
   setMessage("");
 
-  const templateData: NotificationTemplate = {
-    user_id: userId,
-    type: activeTemplate,
-    subject: templateSubject,
-    body: templateBody,
-  };
+const templateData: NotificationTemplate = {
+  user_id: userId,
+  type: activeTemplate,
+  language: "bg",
+  subject: templateSubject,
+  body: templateBody,
+};
 
   const { error } = await supabase
     .from("notification_templates")
     .upsert(templateData, {
-      onConflict: "user_id,type",
+      onConflict: "user_id,type,language",
     });
 
   if (error) {
