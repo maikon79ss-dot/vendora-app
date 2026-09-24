@@ -190,7 +190,7 @@ Vendora`,
 
     if (productError) {
       console.error(productError);
-      alert("Грешка при проверка на наличността.");
+      alert("Error while checking stock availability.");
       return;
     }
 
@@ -207,7 +207,7 @@ Vendora`,
 
       if (stockError) {
         console.error(stockError);
-        alert("Грешка при намаляване на наличността.");
+        alert("Error while updating stock.");
         return;
       }
     }
@@ -222,7 +222,7 @@ Vendora`,
 
     if (orderError) {
       console.error(orderError);
-      alert("Грешка при обновяване на поръчката.");
+      alert("Error while updating the order.");
       return;
     }
 
@@ -254,7 +254,7 @@ await sendStatusEmail(
 
   if (error) {
     console.error(error);
-    alert("Грешка при обновяване на статуса.");
+    alert("Error while updating the order status.");
     return;
   }
 
