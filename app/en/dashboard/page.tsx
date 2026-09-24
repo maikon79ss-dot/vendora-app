@@ -256,7 +256,7 @@ export default function DashboardPage() {
             </p>
 
             <p>
-              <Link href="/statistics">📈 Statistics</Link>
+              <Link href="/en/statistics">📈 Statistics</Link>
             </p>
 
             <p>
