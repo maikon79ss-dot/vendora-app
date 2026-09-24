@@ -1054,7 +1054,9 @@ shipping label.
                   </td>
 
                   <td className="py-3">
-                    {order.variant || "Стандартен"}
+                    {order.variant === "Стандартен" || !order.variant
+  ? "Standard"
+  : order.variant}
                   </td>
 
                   <td className="py-3">
@@ -1075,13 +1077,13 @@ shipping label.
     onClick={() => void generateOrderPDF(orderGroup)}
     className="rounded-lg bg-gray-800 px-5 py-3 text-white hover:bg-gray-900"
   >
-    📄 Изтегли поръчката като PDF
+    📄 Download order as PDF
   </button>
 </div>
 
         <div className="mt-6">
           <label className="mb-2 block font-semibold">
-            Статус на поръчката
+            Order status
           </label>
 
           <select
