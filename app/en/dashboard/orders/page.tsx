@@ -1097,11 +1097,11 @@ shipping label.
             }}
             className="w-full rounded-lg border p-3"
           >
-            <option>Нова</option>
-            <option>Обработва се</option>
-            <option>Изпратена</option>
-            <option>Доставена</option>
-            <option>Отказана</option>
+           <option value="Нова">New</option>
+<option value="Обработва се">Processing</option>
+<option value="Изпратена">Shipped</option>
+<option value="Доставена">Delivered</option>
+<option value="Отказана">Cancelled</option>
           </select>
         </div>
       </div>
