@@ -268,7 +268,7 @@ export default function DashboardPage() {
             </p>
 
             <p>
-              <Link href="/settings">⚙ Settings</Link>
+             <Link href="/en/settings">⚙ Settings</Link> 
             </p>
 
             <Button
