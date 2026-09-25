@@ -24,7 +24,7 @@ export default function LoginPageEn() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/en/dashboard");
   }
 
   return (
