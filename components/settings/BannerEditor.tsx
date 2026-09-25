@@ -12,6 +12,7 @@ type BannerEditorProps = {
   buttonText: string;
   textColor: BannerTextColor;
   textPosition: BannerTextPosition;
+  lang?: "bg" | "en";
   onTitleChange: (value: string) => void;
   onSubtitleChange: (value: string) => void;
   onButtonTextChange: (value: string) => void;
@@ -39,6 +40,7 @@ export default function BannerEditor({
   buttonText,
   textColor,
   textPosition,
+  lang = "bg",
   onTitleChange,
   onSubtitleChange,
   onButtonTextChange,
@@ -47,17 +49,20 @@ export default function BannerEditor({
 }: BannerEditorProps) {
   const textClass = getTextClass(textColor);
   const positionClass = getPositionClass(textPosition);
+  const isEnglish = lang === "en";
 
   return (
     <section className="rounded-2xl bg-white p-8 shadow">
-      <h2 className="text-2xl font-bold">✍️ Редактор на банера</h2>
+      <h2 className="text-2xl font-bold">
+        ✍️ {isEnglish ? "Banner editor" : "Редактор на банера"}
+      </h2>
 
       <div className="mt-6 overflow-hidden rounded-2xl border shadow">
         {bannerUrl ? (
           <div className="relative">
             <img
               src={bannerUrl}
-              alt="Преглед на банера"
+              alt={isEnglish ? "Banner preview" : "Преглед на банера"}
               className="h-72 w-full object-cover"
             />
 
@@ -65,13 +70,17 @@ export default function BannerEditor({
               className={`absolute inset-0 flex flex-col justify-center p-6 md:p-10 ${positionClass}`}
             >
               {title && (
-                <h3 className={`text-3xl font-bold md:text-5xl ${textClass}`}>
+                <h3
+                  className={`text-3xl font-bold md:text-5xl ${textClass}`}
+                >
                   {title}
                 </h3>
               )}
 
               {subtitle && (
-                <p className={`mt-4 text-lg md:text-xl ${textClass}`}>
+                <p
+                  className={`mt-4 text-lg md:text-xl ${textClass}`}
+                >
                   {subtitle}
                 </p>
               )}
@@ -85,60 +94,108 @@ export default function BannerEditor({
           </div>
         ) : (
           <div className="flex h-72 items-center justify-center bg-gray-200 text-gray-500">
-            Изберете или качете банер.
+            {isEnglish
+              ? "Select or upload a banner."
+              : "Изберете или качете банер."}
           </div>
         )}
       </div>
 
       <div className="mt-8 grid gap-5">
         <div>
-          <label className="font-semibold">Заглавие</label>
+          <label className="font-semibold">
+            {isEnglish ? "Title" : "Заглавие"}
+          </label>
+
           <input
             value={title}
-            onChange={(event) => onTitleChange(event.target.value)}
-            placeholder="Например: Summer Sale"
+            onChange={(event) =>
+              onTitleChange(event.target.value)
+            }
+            placeholder={
+              isEnglish
+                ? "Example: Summer Sale"
+                : "Например: Summer Sale"
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
 
         <div>
-          <label className="font-semibold">Подзаглавие</label>
+          <label className="font-semibold">
+            {isEnglish ? "Subtitle" : "Подзаглавие"}
+          </label>
+
           <input
             value={subtitle}
-            onChange={(event) => onSubtitleChange(event.target.value)}
-            placeholder="Например: До 50% намаление"
+            onChange={(event) =>
+              onSubtitleChange(event.target.value)
+            }
+            placeholder={
+              isEnglish
+                ? "Example: Up to 50% off"
+                : "Например: До 50% намаление"
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
 
         <div>
-          <label className="font-semibold">Текст на бутона</label>
+          <label className="font-semibold">
+            {isEnglish ? "Button text" : "Текст на бутона"}
+          </label>
+
           <input
             value={buttonText}
-            onChange={(event) => onButtonTextChange(event.target.value)}
-            placeholder="Например: Купи сега"
+            onChange={(event) =>
+              onButtonTextChange(event.target.value)
+            }
+            placeholder={
+              isEnglish
+                ? "Example: Shop now"
+                : "Например: Купи сега"
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
 
         <div>
-          <label className="font-semibold">Цвят на текста</label>
+          <label className="font-semibold">
+            {isEnglish ? "Text color" : "Цвят на текста"}
+          </label>
+
           <select
             value={textColor}
             onChange={(event) =>
-              onTextColorChange(event.target.value as BannerTextColor)
+              onTextColorChange(
+                event.target.value as BannerTextColor
+              )
             }
             className="mt-2 w-full rounded-lg border p-3"
           >
-            <option value="white">Бял</option>
-            <option value="black">Черен</option>
-            <option value="gold">Златен</option>
-            <option value="blue">Син</option>
+            <option value="white">
+              {isEnglish ? "White" : "Бял"}
+            </option>
+
+            <option value="black">
+              {isEnglish ? "Black" : "Черен"}
+            </option>
+
+            <option value="gold">
+              {isEnglish ? "Gold" : "Златен"}
+            </option>
+
+            <option value="blue">
+              {isEnglish ? "Blue" : "Син"}
+            </option>
           </select>
         </div>
 
         <div>
-          <label className="font-semibold">Позиция на текста</label>
+          <label className="font-semibold">
+            {isEnglish ? "Text position" : "Позиция на текста"}
+          </label>
+
           <select
             value={textPosition}
             onChange={(event) =>
@@ -148,9 +205,17 @@ export default function BannerEditor({
             }
             className="mt-2 w-full rounded-lg border p-3"
           >
-            <option value="left">Ляво</option>
-            <option value="center">Център</option>
-            <option value="right">Дясно</option>
+            <option value="left">
+              {isEnglish ? "Left" : "Ляво"}
+            </option>
+
+            <option value="center">
+              {isEnglish ? "Center" : "Център"}
+            </option>
+
+            <option value="right">
+              {isEnglish ? "Right" : "Дясно"}
+            </option>
           </select>
         </div>
       </div>
