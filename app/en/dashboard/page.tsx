@@ -260,7 +260,7 @@ export default function DashboardPage() {
             </p>
 
             <p>
-              <Link href="/notifications">🔔 Notifications</Link>
+              <Link href="/en/notifications">🔔 Notifications</Link>
             </p>
 
             <p>
