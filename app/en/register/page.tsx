@@ -42,7 +42,7 @@ export default function RegisterPageEn() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/en/dashboard");
   }
 
   return (
