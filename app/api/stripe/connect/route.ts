@@ -232,7 +232,13 @@ export async function POST(
       process.env
         .NEXT_PUBLIC_SITE_URL ||
       "http://localhost:3000";
+        const referer =
+  request.headers.get("referer") || "";
 
+const settingsPath =
+  referer.includes("/en/settings")
+    ? "/en/settings"
+    : "/settings";
     const accountLink =
       await stripe.accountLinks.create({
         account: stripeAccountId,
@@ -240,10 +246,11 @@ export async function POST(
         type: "account_onboarding",
 
         refresh_url:
-          `${siteUrl}/settings?stripe=refresh`,
+  `${siteUrl}${settingsPath}?stripe=refresh`,
+          
 
-        return_url:
-          `${siteUrl}/settings?stripe=return`,
+       return_url:
+  `${siteUrl}${settingsPath}?stripe=return`,
 
         collection_options: {
           fields: "eventually_due",
