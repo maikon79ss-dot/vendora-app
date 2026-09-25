@@ -7,6 +7,7 @@ type BannerGalleryProps = {
   selectedBanner: string;
   isPremium: boolean;
   subscriptionPlan: string;
+  lang?: "bg" | "en";
   onSelect: (template: BannerTemplate) => void;
 };
 
@@ -15,22 +16,34 @@ export default function BannerGallery({
   selectedBanner,
   isPremium,
   subscriptionPlan,
+  lang = "bg",
   onSelect,
 }: BannerGalleryProps) {
+  const isEnglish = lang === "en";
+
   const planLabel =
     subscriptionPlan === "premium_monthly"
-      ? "Premium месечен"
+      ? isEnglish
+        ? "Premium Monthly"
+        : "Premium месечен"
       : subscriptionPlan === "premium_yearly"
-        ? "Premium годишен"
+        ? isEnglish
+          ? "Premium Yearly"
+          : "Premium годишен"
         : "Free";
 
   return (
     <section className="rounded-2xl bg-white p-8 shadow">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">🎨 Шаблони за банер</h2>
+          <h2 className="text-2xl font-bold">
+            🎨 {isEnglish ? "Banner templates" : "Шаблони за банер"}
+          </h2>
+
           <p className="mt-2 text-gray-500">
-            Free планът включва основни шаблони. Premium отключва всички.
+            {isEnglish
+              ? "The Free plan includes basic templates. Premium unlocks all templates."
+              : "Free планът включва основни шаблони. Premium отключва всички."}
           </p>
         </div>
 
@@ -41,7 +54,9 @@ export default function BannerGallery({
 
       {templates.length === 0 ? (
         <p className="mt-6 rounded-xl bg-gray-100 p-5 text-gray-600">
-          Няма намерени банери.
+          {isEnglish
+            ? "No banners found."
+            : "Няма намерени банери."}
         </p>
       ) : (
         <div className="mt-6 grid gap-5 md:grid-cols-2">
@@ -73,7 +88,7 @@ export default function BannerGallery({
 
                   {selected && (
                     <span className="absolute right-3 top-3 rounded-full bg-green-600 px-4 py-2 font-bold text-white">
-                      ✓ Избран
+                      ✓ {isEnglish ? "Selected" : "Избран"}
                     </span>
                   )}
                 </div>
@@ -93,10 +108,16 @@ export default function BannerGallery({
                     }`}
                   >
                     {locked
-                      ? "Само за Premium"
+                      ? isEnglish
+                        ? "Premium only"
+                        : "Само за Premium"
                       : selected
-                        ? "Избран шаблон"
-                        : "Избери шаблона"}
+                        ? isEnglish
+                          ? "Selected template"
+                          : "Избран шаблон"
+                        : isEnglish
+                          ? "Select template"
+                          : "Избери шаблона"}
                   </button>
                 </div>
               </article>
