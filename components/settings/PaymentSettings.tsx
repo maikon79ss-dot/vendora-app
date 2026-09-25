@@ -27,14 +27,19 @@ bankName: string;
 onBankNameChange: (value: string) => void;
   codEnabled: boolean;
   onCodEnabledChange: (value: boolean) => void;
+  lang?: "bg" | "en";
 };
-async function connectStripe() {
+async function connectStripe(lang: "bg" | "en") {
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
   if (!session) {
-    alert("Не сте влезли в профила си.");
+    alert(
+  lang === "en"
+    ? "You are not signed in."
+    : "Не сте влезли в профила си."
+);
     return;
   }
 
@@ -86,6 +91,7 @@ onBankNameChange,
 
   codEnabled,
   onCodEnabledChange,
+  lang = "bg",
 }: PaymentSettingsProps) {
   return (
     <section className="rounded-2xl bg-white p-8 shadow space-y-8">
@@ -138,10 +144,10 @@ onBankNameChange,
 
   <button
     type="button"
-    onClick={connectStripe}
+    onClick={() => connectStripe(lang)}
     className="mt-3 rounded-lg bg-indigo-600 px-4 py-2 text-white"
   >
-    Свържи Stripe
+    {lang === "en" ? "Connect Stripe" : "Свържи Stripe"}
   </button>
 </div>
 
@@ -163,7 +169,11 @@ onBankNameChange,
       onChange={(event) =>
         onPaypalPaymentLinkChange(event.target.value)
       }
-      placeholder="https://paypal.me/вашето-име"
+      placeholder={
+  lang === "en"
+    ? "https://paypal.me/your-name"
+    : "https://paypal.me/вашето-име"
+}
       className="mt-3 w-full rounded-lg border p-3"
     />
   )}
@@ -188,7 +198,11 @@ onBankNameChange,
       onChange={(event) =>
         onRevolutPaymentLinkChange(event.target.value)
       }
-      placeholder="https://revolut.me/вашето-име"
+      placeholder={
+  lang === "en"
+    ? "https://revolut.me/your-name"
+    : "https://revolut.me/вашето-име"
+}
       className="mt-3 w-full rounded-lg border p-3"
     />
   )}
@@ -213,7 +227,11 @@ onBankNameChange,
         onChange={(event) =>
           onBankAccountHolderChange(event.target.value)
         }
-        placeholder="Титуляр на банковата сметка"
+        placeholder={
+  lang === "en"
+    ? "Bank account holder"
+    : "Титуляр на банковата сметка"
+}
         className="w-full rounded-lg border p-3"
       />
 
@@ -231,7 +249,11 @@ onBankNameChange,
         onChange={(event) =>
           onBankNameChange(event.target.value)
         }
-        placeholder="Име на банката"
+        placeholder={
+  lang === "en"
+    ? "Bank name"
+    : "Име на банката"
+}
         className="w-full rounded-lg border p-3"
       />
     </div>
