@@ -95,7 +95,7 @@ export default function DashboardPage() {
       const revenueByDate: Record<string, number> = {};
 
       deliveredOrders?.forEach((order) => {
-        const date = new Date(order.created_at).toLocaleDateString("bg-BG");
+        const date = new Date(order.created_at).toLocaleDateString("en-GB");
 
         revenueByDate[date] =
           (revenueByDate[date] || 0) + Number(order.total_price || 0);
@@ -105,7 +105,7 @@ export default function DashboardPage() {
         .map(([date, revenue]) => ({
           date,
           revenue,
-          sortDate: new Date(date.split(".").reverse().join("-")),
+          sortDate: new Date(date.split("/").reverse().join("-")),
         }))
         .sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime())
         .map(({ date, revenue }) => ({
