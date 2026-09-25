@@ -498,7 +498,7 @@ setBankName(
 
       if (error) {
         console.error(
-          `Error while reading folder "${folderPath}":`
+          `Error while reading folder "${folderPath}":`,
           error
         );
 
