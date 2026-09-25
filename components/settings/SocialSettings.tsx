@@ -6,6 +6,7 @@ type SocialSettingsProps = {
   tiktok: string;
   youtube: string;
   website: string;
+  lang?: "bg" | "en";
   onFacebookChange: (value: string) => void;
   onInstagramChange: (value: string) => void;
   onTiktokChange: (value: string) => void;
@@ -19,22 +20,29 @@ export default function SocialSettings({
   tiktok,
   youtube,
   website,
+  lang = "bg",
   onFacebookChange,
   onInstagramChange,
   onTiktokChange,
   onYoutubeChange,
   onWebsiteChange,
 }: SocialSettingsProps) {
+  const isEnglish = lang === "en";
+
   return (
     <section className="rounded-2xl bg-white p-8 shadow">
-      <h2 className="text-2xl font-bold">📱 Социални мрежи</h2>
+      <h2 className="text-2xl font-bold">
+        📱 {isEnglish ? "Social media" : "Социални мрежи"}
+      </h2>
 
       <div className="mt-6 grid gap-5">
         <div>
           <label className="font-semibold">Facebook</label>
           <input
             value={facebook}
-            onChange={(event) => onFacebookChange(event.target.value)}
+            onChange={(event) =>
+              onFacebookChange(event.target.value)
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
@@ -43,7 +51,9 @@ export default function SocialSettings({
           <label className="font-semibold">Instagram</label>
           <input
             value={instagram}
-            onChange={(event) => onInstagramChange(event.target.value)}
+            onChange={(event) =>
+              onInstagramChange(event.target.value)
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
@@ -52,7 +62,9 @@ export default function SocialSettings({
           <label className="font-semibold">TikTok</label>
           <input
             value={tiktok}
-            onChange={(event) => onTiktokChange(event.target.value)}
+            onChange={(event) =>
+              onTiktokChange(event.target.value)
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
@@ -61,7 +73,9 @@ export default function SocialSettings({
           <label className="font-semibold">YouTube</label>
           <input
             value={youtube}
-            onChange={(event) => onYoutubeChange(event.target.value)}
+            onChange={(event) =>
+              onYoutubeChange(event.target.value)
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
@@ -70,7 +84,9 @@ export default function SocialSettings({
           <label className="font-semibold">Website</label>
           <input
             value={website}
-            onChange={(event) => onWebsiteChange(event.target.value)}
+            onChange={(event) =>
+              onWebsiteChange(event.target.value)
+            }
             className="mt-2 w-full rounded-lg border p-3"
           />
         </div>
