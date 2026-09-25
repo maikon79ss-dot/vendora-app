@@ -3,6 +3,7 @@
 type UploadSectionProps = {
   logoUrl: string;
   bannerUrl: string;
+  lang?: "bg" | "en";
   onLogoFileChange: (file: File | null) => void;
   onBannerFileChange: (file: File | null) => void;
 };
@@ -10,16 +11,24 @@ type UploadSectionProps = {
 export default function UploadSection({
   logoUrl,
   bannerUrl,
+  lang = "bg",
   onLogoFileChange,
   onBannerFileChange,
 }: UploadSectionProps) {
+  const isEnglish = lang === "en";
+
   return (
     <section className="rounded-2xl bg-white p-8 shadow">
-      <h2 className="text-2xl font-bold">🖼️ Лого и собствен банер</h2>
+      <h2 className="text-2xl font-bold">
+        🖼️ {isEnglish ? "Logo and custom banner" : "Лого и собствен банер"}
+      </h2>
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
         <div>
-          <label className="font-semibold">Лого</label>
+          <label className="font-semibold">
+            {isEnglish ? "Logo" : "Лого"}
+          </label>
+
           <input
             type="file"
             accept="image/*"
@@ -32,14 +41,17 @@ export default function UploadSection({
           {logoUrl && (
             <img
               src={logoUrl}
-              alt="Лого"
+              alt={isEnglish ? "Logo" : "Лого"}
               className="mt-4 h-28 w-28 rounded-full object-cover"
             />
           )}
         </div>
 
         <div>
-          <label className="font-semibold">Собствен банер</label>
+          <label className="font-semibold">
+            {isEnglish ? "Custom banner" : "Собствен банер"}
+          </label>
+
           <input
             type="file"
             accept="image/*"
@@ -52,7 +64,7 @@ export default function UploadSection({
           {bannerUrl && (
             <img
               src={bannerUrl}
-              alt="Банер"
+              alt={isEnglish ? "Banner" : "Банер"}
               className="mt-4 h-36 w-full rounded-xl object-cover"
             />
           )}
