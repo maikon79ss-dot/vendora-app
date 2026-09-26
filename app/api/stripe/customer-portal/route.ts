@@ -162,12 +162,13 @@ export async function POST(
       await stripe.billingPortal.sessions.create({
         customer:
           profile.stripe_customer_id,
-
+locale:
+  language === "en" ? "en" : "bg",
       return_url:
   `${siteUrl}${
     language === "en"
-      ? "/en/plan"
-      : "/plan"
+      ? "/en/payments"
+      : "/payments"
   }`,
       });
 
