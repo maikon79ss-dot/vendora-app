@@ -108,7 +108,7 @@ const { toggleWishlist, isInWishlist } = useWishlist();
           storeSlug: slug,
         })
       }
-      className="absolute right-2 top-2 z-10 rounded-full bg-white px-2 py-1.5 text-lg shadow sm:right-3 sm:top-3 sm:px-3 sm:py-2 sm:text-2xl"
+      className="absolute right-1.5 top-1.5 z-10 rounded-full bg-white px-1.5 py-1 text-base shadow sm:right-3 sm:top-3 sm:px-3 sm:py-2 sm:text-2xl"
       aria-label="Добави в любими"
     >
       {isInWishlist(product.id) ? "❤️" : "🤍"}
@@ -118,16 +118,16 @@ const { toggleWishlist, isInWishlist } = useWishlist();
       <img
         src={product.image_url}
         alt={product.name}
-        className="h-40 w-full object-cover sm:h-52 md:h-64"
+        className="h-32 w-full object-cover sm:h-52 md:h-64"
       />
     )}
 
-    <div className="p-3 sm:p-4 md:p-6">
-      <h3 className="line-clamp-2 text-sm font-bold leading-5 sm:text-lg md:text-2xl">
+    <div className="p-2.5 sm:p-4 md:p-6">
+      <h3 className="line-clamp-2 text-xs font-bold leading-4 sm:text-lg md:text-2xl">
         {product.name}
       </h3>
 
-      <p className="mt-2 text-lg font-bold text-blue-600 sm:text-xl md:mt-3 md:text-2xl">
+      <p className="mt-1.5 text-base font-bold text-blue-600 sm:text-xl md:mt-3 md:text-2xl">
         € {product.price}
       </p>
 
@@ -136,18 +136,18 @@ const { toggleWishlist, isInWishlist } = useWishlist();
           ⭐ {product.average_rating?.toFixed(1)} ({product.review_count})
         </p>
       ) : (
-        <p className="mt-1 text-xs text-gray-400 sm:mt-2 sm:text-sm">
-          Все още няма оценки
-        </p>
+       <p className="hidden text-gray-400 sm:mt-2 sm:block sm:text-sm">
+  Все още няма оценки
+</p>
       )}
 
-      <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-600 sm:mt-3 sm:text-sm md:mt-4 md:text-base">
+      <p className="hidden sm:block sm:mt-3 sm:line-clamp-2 sm:text-sm sm:leading-5 sm:text-gray-600 md:mt-4 md:text-base">
         {product.description}
       </p>
 
       <Link
         href={`/store/${slug}/product/${product.id}`}
-        className="mt-3 block rounded-lg bg-blue-600 px-2 py-2 text-center text-xs font-semibold text-white sm:mt-4 sm:py-2.5 sm:text-sm md:mt-6 md:py-3 md:text-base"
+        className="mt-2.5 block rounded-lg bg-blue-600 px-2 py-1.5 text-center text-xs font-semibold text-white sm:mt-4 sm:py-2.5 sm:text-sm md:mt-6 md:py-3 md:text-base"
       >
         👁️ Преглед
       </Link>
