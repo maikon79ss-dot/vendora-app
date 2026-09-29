@@ -387,7 +387,7 @@ const averageRating =
               <img
                 src={selectedImage}
                 alt={product.name}
-                className="h-96 w-full rounded-xl object-cover"
+               className="h-96 w-full rounded-xl bg-gray-50 object-contain" 
               />
 
               {allImages.length > 1 && (
@@ -432,7 +432,7 @@ const averageRating =
                   <img
                     src={imageUrl}
                     alt={`${product.name} ${index + 1}`}
-                    className="h-20 w-full object-cover"
+                    className="h-20 w-full bg-gray-50 object-contain"
                   />
                 </button>
               ))}
