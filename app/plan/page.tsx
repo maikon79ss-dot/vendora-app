@@ -23,7 +23,11 @@ export default function PlanPage() {
     useState(false);
 
   const [message, setMessage] = useState("");
+const [currentPeriodEnd, setCurrentPeriodEnd] =
+  useState<string | null>(null);
 
+const [cancelAtPeriodEnd, setCancelAtPeriodEnd] =
+  useState(false);
   const promoActive =
     process.env.NEXT_PUBLIC_PROMO_ACTIVE === "true";
 
@@ -82,7 +86,29 @@ export default function PlanPage() {
     } else {
       setCurrentPlan("free");
     }
+    const subscriptionResponse = await fetch(
+      "/api/stripe/subscription-status",
+      {
+        method: "POST",
+        headers: {
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+      }
+    );
 
+    if (subscriptionResponse.ok) {
+      const subscriptionData =
+        await subscriptionResponse.json();
+
+      setCurrentPeriodEnd(
+        subscriptionData.currentPeriodEnd || null
+      );
+
+      setCancelAtPeriodEnd(
+        subscriptionData.cancelAtPeriodEnd === true
+      );
+    }
     setLoading(false);
   }
 
@@ -199,7 +225,12 @@ export default function PlanPage() {
       setPortalLoading(false);
     }
   }
-
+const formattedPeriodEnd =
+  currentPeriodEnd
+    ? new Date(
+        currentPeriodEnd
+      ).toLocaleDateString("bg-BG")
+    : null;
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -235,7 +266,13 @@ export default function PlanPage() {
             {message}
           </p>
         )}
-
+{currentPlan !== "free" && formattedPeriodEnd && (
+  <div className="mx-auto mt-6 max-w-3xl rounded-xl bg-blue-50 p-4 text-center font-semibold text-blue-700">
+    {cancelAtPeriodEnd
+      ? `Вашият план изтича на ${formattedPeriodEnd}.`
+      : `Вашият план се подновява на ${formattedPeriodEnd}.`}
+  </div>
+)}
         <div className="mt-12 grid gap-8 lg:grid-cols-3">
           {/* Free */}
           <section className="flex flex-col rounded-3xl bg-white p-8 shadow">
