@@ -484,21 +484,21 @@ export async function POST(
          * докато Stripe действително изпрати
          * customer.subscription.deleted.
          */
-        const premiumIsActive =
-          subscription.status ===
-            "active" ||
-          subscription.status ===
-            "trialing" ||
-          subscription.status ===
-            "past_due";
+      const premiumIsActive =
+  subscription.status ===
+    "active" ||
+  subscription.status ===
+    "trialing";
 
-        const subscriptionEnded =
-          subscription.status ===
-            "canceled" ||
-          subscription.status ===
-            "unpaid" ||
-          subscription.status ===
-            "incomplete_expired";
+const subscriptionEnded =
+  subscription.status ===
+    "past_due" ||
+  subscription.status ===
+    "canceled" ||
+  subscription.status ===
+    "unpaid" ||
+  subscription.status ===
+    "incomplete_expired";
 
         const values: Record<
           string,
@@ -706,10 +706,10 @@ export async function POST(
       }
 
       /*
-       * Неуспешно автоматично подновяване.
-       * Не сваляме Premium веднага, защото
-       * Stripe може да направи нов опит.
-       */
+ * Неуспешно автоматично подновяване.
+ * Vendora временно преминава на Free,
+ * докато Stripe прави повторни опити.
+ */
       case "invoice.payment_failed": {
         const invoice =
           event.data
@@ -757,21 +757,21 @@ export async function POST(
         }
 
         await updateProfile(
-          userId,
-          {
-            /*
-             * Оставяме plan: premium
-             * временно, докато Stripe
-             * прави повторни опити.
-             */
-            subscription_status:
-              "past_due",
+  userId,
+  {
+    plan: "free",
 
-            cancel_at_period_end:
-              subscription
-                .cancel_at_period_end,
-          }
-        );
+    subscription_plan:
+      "free",
+
+    subscription_status:
+      "past_due",
+
+    cancel_at_period_end:
+      subscription
+        .cancel_at_period_end,
+  }
+);
 
         console.log(
           `Неуспешно плащане за ${userId}: ${invoice.id}`
