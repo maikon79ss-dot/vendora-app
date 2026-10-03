@@ -57,21 +57,25 @@ const productsWithRatings: Product[] = (products || []).map(
     const reviewCount = productReviews.length;
 
     const averageRating =
-      reviewCount > 0
-        ? productReviews.reduce(
-            (total, review) =>
-              total + Number(review.rating || 0),
-            0
-          ) / reviewCount
-        : 0;
+  reviewCount > 0
+    ? productReviews.reduce(
+        (total, review) =>
+          total + Number(review.rating || 0),
+        0
+      ) / reviewCount
+    : 0;
 
-    return {
-      ...product,
-      average_rating: averageRating,
-      review_count: reviewCount,
-    };
+return {
+  ...product,
+  average_rating: averageRating,
+  review_count: reviewCount,
+};
   }
 );
+  const visibleProducts =
+  profile?.plan === "premium"
+    ? productsWithRatings
+    : productsWithRatings.slice(0, 5);
   return (
     <main className="min-h-screen bg-gray-100">
       <section className="relative bg-blue-600 text-white">
@@ -174,7 +178,7 @@ const productsWithRatings: Product[] = (products || []).map(
         {products?.length === 0 && <p>Все още няма добавени продукти.</p>}
 
 <StoreProducts
-  products={productsWithRatings}
+  products={visibleProducts}
   slug={slug}
 />
       </section>
