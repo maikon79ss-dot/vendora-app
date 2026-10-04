@@ -12,9 +12,11 @@ type Product = {
   category?: string;
   id: string;
   name: string;
+   name_en?: string | null;
   price: string;
   stock: number;
   description: string;
+  description_en?: string | null;
   payment_link: string;
   image_url?: string;
   owner_id?: string;
@@ -147,7 +149,65 @@ setSubscriptionPlan(profile?.subscription_plan || "free");
 
     setProducts(data || []);
   }
+async function translateProductText(
+  productName: string,
+  productDescription: string
+) {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
+    if (!session) {
+      return null;
+    }
+
+    const response = await fetch(
+      "/api/translate-product",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          name: productName,
+          description:
+            productDescription,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error(
+        "Translation error:",
+        data
+      );
+
+      return null;
+    }
+
+    return {
+      nameEn:
+        String(data.name_en || ""),
+      descriptionEn:
+        String(
+          data.description_en || ""
+        ),
+    };
+  } catch (error) {
+    console.error(
+      "Automatic translation error:",
+      error
+    );
+
+    return null;
+  }
+}
 async function uploadImage() {
   if (!imageFile) return "";
 
@@ -272,13 +332,63 @@ if (normalizedPaymentLink !== defaultPaymentLink) {
 
   setDefaultPaymentLink(normalizedPaymentLink);
 }
+      const existingProduct =
+  editingId
+    ? products.find(
+        (product) =>
+          product.id === editingId
+      )
+    : null;
+
+let nameEn =
+  existingProduct?.name_en || "";
+
+let descriptionEn =
+  existingProduct?.description_en || "";
+
+let translationFailed = false;
+
+const shouldTranslate =
+  !existingProduct ||
+  existingProduct.name !== name ||
+  existingProduct.description !==
+    description ||
+  !nameEn ||
+  !descriptionEn;
+
+if (shouldTranslate) {
+  const translation =
+    await translateProductText(
+      name,
+      description
+    );
+
+  if (translation) {
+    nameEn = translation.nameEn;
+    descriptionEn =
+      translation.descriptionEn;
+  } else {
+    /*
+     * При проблем с DeepL не спираме
+     * добавянето на продукта.
+     * EN магазинът временно ще използва
+     * българския текст.
+     */
+    nameEn = "";
+    descriptionEn = "";
+    translationFailed = true;
+  }
+}
       const imageUrl = await uploadImage();
 
-      const productData = {
-        name,
-        price,
-        stock: Number(stock),
-        description,
+    const productData = {
+  name,
+  name_en: nameEn,
+  price,
+  stock: Number(stock),
+  description,
+  description_en:
+    descriptionEn,
         payment_link: paymentLink,
         product_type: productType,
         category,
@@ -313,7 +423,11 @@ if (normalizedPaymentLink !== defaultPaymentLink) {
           return;
         }
 
-        setMessage("Продуктът е редактиран успешно.");
+        setMessage(
+  translationFailed
+    ? "Продуктът е редактиран, но английският превод не успя."
+    : "Продуктът е редактиран успешно."
+);
       } else {
        const { data: createdProducts, error } = await supabase
   .from("products")
@@ -339,7 +453,11 @@ if (createdProductId !== undefined && createdProductId !== null) {
   await uploadGalleryImages(String(createdProductId));
 }
 
-        setMessage("Продуктът е записан успешно.");
+        setMessage(
+  translationFailed
+    ? "Продуктът е записан, но английският превод не успя."
+    : "Продуктът е записан успешно."
+);
       }
 
       resetForm();
