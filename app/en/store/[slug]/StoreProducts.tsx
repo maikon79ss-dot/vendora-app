@@ -123,39 +123,22 @@ export default function StoreProducts({
                 className="h-32 w-full object-cover sm:h-52 md:h-64"
               />
             )}
-
             <div className="p-2.5 sm:p-4 md:p-6">
-              <h3 className="line-clamp-2 text-xs font-bold leading-4 sm:text-lg md:text-2xl">
-                {product.name}
-              </h3>
+  <h3 className="line-clamp-2 text-xs font-bold leading-4 sm:text-lg sm:leading-6 md:text-2xl md:leading-7">
+    {product.name}
+  </h3>
 
-              <p className="mt-1.5 text-base font-bold text-blue-600 sm:text-xl md:mt-3 md:text-2xl">
-                € {product.price}
-              </p>
+  <p className="mt-1.5 text-base font-bold text-blue-600 sm:text-xl md:mt-3 md:text-2xl">
+    € {product.price}
+  </p>
 
-              {product.review_count &&
-              product.review_count > 0 ? (
-                <p className="mt-1 text-xs font-semibold text-yellow-500 sm:mt-2 sm:text-sm">
-                  ⭐ {product.average_rating?.toFixed(1)} (
-                  {product.review_count})
-                </p>
-              ) : (
-                <p className="hidden text-gray-400 sm:mt-2 sm:block sm:text-sm">
-                  No ratings yet
-                </p>
-              )}
-
-              <p className="hidden sm:block sm:mt-3 sm:line-clamp-2 sm:text-sm sm:leading-5 sm:text-gray-600 md:mt-4 md:text-base">
-                {product.description}
-              </p>
-
-              <Link
-                href={`/en/store/${slug}/product/${product.id}`}
-                className="mt-2.5 block rounded-lg bg-blue-600 px-2 py-1.5 text-center text-xs font-semibold text-white sm:mt-4 sm:py-2.5 sm:text-sm md:mt-6 md:py-3 md:text-base"
-              >
-                👁️ View
-              </Link>
-            </div>
+  <Link
+    href={`/en/store/${slug}/product/${product.id}`}
+    className="mt-2.5 block rounded-lg bg-blue-600 px-2 py-1.5 text-center text-xs font-semibold text-white sm:mt-4 sm:py-2.5 sm:text-sm md:mt-6 md:py-3 md:text-base"
+  >
+    👁️ View
+  </Link>
+</div>
           </div>
         ))}
       </div>
