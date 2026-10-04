@@ -7,8 +7,10 @@ export const revalidate = 0;
 type Product = {
   id: string;
   name: string;
+  name_en?: string | null;
   price: string;
   description: string;
+  description_en?: string | null;
   payment_link: string;
   image_url: string;
   category?: string;
@@ -68,14 +70,20 @@ export default async function StorePageEn({ params }: Props) {
             ) / reviewCount
           : 0;
 
-      return {
-        ...product,
-        average_rating: averageRating,
-        review_count: reviewCount,
-      };
+     return {
+  ...product,
+  name: product.name_en || product.name,
+  description:
+    product.description_en || product.description,
+  average_rating: averageRating,
+  review_count: reviewCount,
+};
     }
   );
-
+const visibleProducts =
+  profile?.plan === "premium"
+    ? productsWithRatings
+    : productsWithRatings.slice(0, 5);
   return (
     <main
       lang="en"
@@ -187,14 +195,14 @@ export default async function StorePageEn({ params }: Props) {
           Products
         </h2>
 
-        {productsWithRatings.length === 0 && (
+        {visibleProducts.length === 0 && (
           <p>No products have been added yet.</p>
         )}
 
-        <StoreProducts
-          products={productsWithRatings}
-          slug={decodedSlug}
-        />
+       <StoreProducts
+  products={visibleProducts}
+  slug={decodedSlug}
+/>
       </section>
     </main>
   );
