@@ -506,9 +506,13 @@ const averageRating =
           >
             {product.has_variants &&
             product.variant_values?.length ? (
-              product.variant_values.map((value) => (
-                <option key={value}>{value}</option>
-              ))
+             product.variant_values.map((value) => (
+  <option key={value} value={value}>
+    {value.toLowerCase() === "кожа"
+      ? "Leather"
+      : value}
+  </option>
+))
             ) : (
             <option value="Стандартен">Standard</option>
             )}
