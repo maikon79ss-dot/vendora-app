@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 type Product = {
   id: string;
   name: string;
+  name_en?: string | null;
   price: string;
   description: string;
+  description_en?: string | null;
   payment_link: string;
   image_url?: string;
   store_slug: string;
@@ -148,7 +150,15 @@ async function sendSellerEmail(
 
     if (!productData) return;
 
-    setProduct(productData);
+    setProduct({
+  ...productData,
+  name:
+    productData.name_en ||
+    productData.name,
+  description:
+    productData.description_en ||
+    productData.description,
+});
 const { data: profile, error: profileError } = await supabase
   .from("profiles")
   .select("id, email")
@@ -471,11 +481,23 @@ const averageRating =
 
           <p className="mt-6 text-gray-600">{product.description}</p>
 
-          <label className="mt-8 block font-semibold">
-            {product.has_variants
-  ? product.variant_name
-  : "Variant"}
-          </label>
+        <label className="mt-8 block font-semibold">
+  {product.has_variants
+    ? product.variant_name === "Размер"
+      ? "Size"
+      : product.variant_name === "Цвят"
+        ? "Color"
+        : product.variant_name === "Номер"
+          ? "Size"
+          : product.variant_name === "Памет"
+            ? "Memory"
+            : product.variant_name === "Обем"
+              ? "Capacity"
+              : product.variant_name === "Материал"
+                ? "Material"
+                : "Variant"
+    : "Variant"}
+</label>
 
           <select
             value={selectedVariant}
