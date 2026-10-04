@@ -208,6 +208,76 @@ async function translateProductText(
     return null;
   }
 }
+async function translateAllProducts() {
+  if (!userId) {
+    setMessage("Няма активен потребител.");
+    return;
+  }
+
+  const productsToTranslate =
+    products.filter(
+      (product) =>
+        !product.name_en ||
+        !product.description_en
+    );
+
+  if (productsToTranslate.length === 0) {
+    setMessage(
+      "Всички продукти вече имат английски превод."
+    );
+    return;
+  }
+
+  setMessage(
+    `Превеждат се ${productsToTranslate.length} продукта...`
+  );
+
+  let translatedCount = 0;
+  let failedCount = 0;
+
+  for (const product of productsToTranslate) {
+    const translation =
+      await translateProductText(
+        product.name,
+        product.description
+      );
+
+    if (!translation) {
+      failedCount += 1;
+      continue;
+    }
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        name_en: translation.nameEn,
+        description_en:
+          translation.descriptionEn,
+      })
+      .eq("id", product.id)
+      .eq("owner_id", userId);
+
+    if (error) {
+      console.error(
+        "Bulk translation update error:",
+        error
+      );
+
+      failedCount += 1;
+      continue;
+    }
+
+    translatedCount += 1;
+  }
+
+  await loadProducts(userId);
+
+  setMessage(
+    failedCount > 0
+      ? `Преведени: ${translatedCount}. Неуспешни: ${failedCount}.`
+      : `✅ Всички ${translatedCount} продукта са преведени на английски.`
+  );
+}  
 async function uploadImage() {
   if (!imageFile) return "";
 
@@ -579,7 +649,15 @@ if (createdProductId !== undefined && createdProductId !== null) {
     <option>Азбучен ред</option>
   </select>
 </div>
-
+      <div className="mb-6">
+  <button
+    type="button"
+    onClick={translateAllProducts}
+    className="rounded-xl bg-purple-600 px-6 py-3 font-semibold text-white hover:bg-purple-700"
+  >
+    🌍 Преведи всички продукти на английски
+  </button>
+</div>
       <form
         onSubmit={addOrUpdateProduct}
         className="max-w-2xl rounded-xl bg-white p-6 shadow"
