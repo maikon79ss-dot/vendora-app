@@ -127,7 +127,7 @@ export async function POST(
       : [name];
 
     const response = await fetch(
-      "https://api.deepl.com/v2/translate",
+      "https://api-free.deepl.com/v2/translate",
       {
         method: "POST",
         headers: {
