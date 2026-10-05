@@ -41,6 +41,10 @@ const id = params.id as string;
 const { addToCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [sellerEmail, setSellerEmail] = useState("");
+  const [
+  freeShippingThreshold,
+  setFreeShippingThreshold,
+] = useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<ProductImage[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
 const router = useRouter();
@@ -151,7 +155,7 @@ async function sendSellerEmail(
     setProduct(productData);
 const { data: profile, error: profileError } = await supabase
   .from("profiles")
-  .select("id, email")
+  .select("id, email, free_shipping_threshold")
   .eq("id", productData.owner_id)
   .single();
 
@@ -163,6 +167,15 @@ console.log("Email:", profile?.email);
 if (profile?.email) {
   setSellerEmail(profile.email);
 }
+ const threshold = Number(
+  profile?.free_shipping_threshold
+);
+
+setFreeShippingThreshold(
+  Number.isFinite(threshold) && threshold > 0
+    ? threshold
+    : null
+);   
 console.log("Имейл на продавача:", profile?.email);
     setSelectedImage(productData.image_url || "");
 
@@ -456,7 +469,14 @@ const averageRating =
               ❌ Изчерпан
             </p>
           )}
-
+           {freeShippingThreshold !== null && (
+  <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
+    <p className="font-semibold">
+      🚚 Безплатна доставка при поръчка от €
+      {freeShippingThreshold}
+    </p>
+  </div>
+)}
           <p className="mt-6 text-gray-600">{product.description}</p>
 
           <label className="mt-8 block font-semibold">
