@@ -31,6 +31,10 @@ const [econtSelection, setEcontSelection] =
   useState<EcontSelection | null>(null);
   const [econtEnabled, setEcontEnabled] =
   useState(false);
+  const [
+  freeShippingThreshold,
+  setFreeShippingThreshold,
+] = useState<number | null>(null);
 const [paymentMethod, setPaymentMethod] =
   useState("");
 
@@ -132,8 +136,9 @@ useEffect(() => {
   revolut_enabled,
   bank_transfer_enabled,
   cod_enabled,
-  econt_enabled,
-  paypal_payment_link,
+econt_enabled,
+free_shipping_threshold,
+paypal_payment_link,
   revolut_payment_link,
   bank_account_holder,
   bank_iban,
@@ -160,6 +165,15 @@ useEffect(() => {
 });
 
 setEcontEnabled(data?.econt_enabled ?? false);
+   const threshold = Number(
+  data?.free_shipping_threshold
+);
+
+setFreeShippingThreshold(
+  Number.isFinite(threshold) && threshold > 0
+    ? threshold
+    : null
+); 
 setPaymentLinks({
   paypal: data?.paypal_payment_link || "",
   revolut: data?.revolut_payment_link || "",
@@ -1193,6 +1207,21 @@ Vendora`
 <p className="text-4xl font-bold text-blue-600">
   {finalTotal.toFixed(2)} €
 </p>
+ {freeShippingThreshold !== null && (
+  <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
+    {finalTotal >= freeShippingThreshold ? (
+      <p className="font-semibold text-green-700">
+        ✅ Безплатна доставка за тази поръчка
+      </p>
+    ) : (
+      <p className="font-semibold text-green-700">
+        🚚 Добавете още €
+        {(freeShippingThreshold - finalTotal).toFixed(2)}
+        {" "}за безплатна доставка
+      </p>
+    )}
+  </div>
+)}             
 <div className="mt-8 rounded-2xl bg-white p-5 shadow sm:p-8">
   <h2 className="text-xl font-bold sm:text-2xl">
     🎟 Код за отстъпка
