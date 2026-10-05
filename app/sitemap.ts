@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { supabase } from "@/lib/supabaseClient";
-
+export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
