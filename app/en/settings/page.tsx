@@ -55,6 +55,10 @@ export default function SettingsPage() {
   const [website, setWebsite] = useState("");
   const [defaultPaymentLink, setDefaultPaymentLink] =
     useState("");
+  const [
+  freeShippingThreshold,
+  setFreeShippingThreshold,
+] = useState("");
 const [stripeEnabled, setStripeEnabled] =
   useState(false);
 
@@ -367,6 +371,12 @@ message:
     setDefaultPaymentLink(
       data?.default_payment_link || ""
     );
+    setFreeShippingThreshold(
+  data?.free_shipping_threshold !== null &&
+    data?.free_shipping_threshold !== undefined
+    ? String(data.free_shipping_threshold)
+    : ""
+);
 setStripeEnabled(data?.stripe_enabled ?? false);
 
 setPaypalEnabled(data?.paypal_enabled ?? false);
@@ -972,6 +982,24 @@ await loadEcontProfile(
 
     setSaving(true);
     setMessage("");
+    const normalizedFreeShippingThreshold =
+  freeShippingThreshold.trim();
+
+if (
+  normalizedFreeShippingThreshold &&
+  (
+    Number.isNaN(
+      Number(normalizedFreeShippingThreshold)
+    ) ||
+    Number(normalizedFreeShippingThreshold) <= 0
+  )
+) {
+  setMessage(
+    "The free shipping threshold must be a number greater than 0."
+  );
+  setSaving(false);
+  return;
+}
 if (
   paypalEnabled &&
   !paypalPaymentLink.trim()
@@ -1062,6 +1090,12 @@ console.log("PAYMENT SETTINGS BEFORE SAVE:", {
 
         default_payment_link:
           defaultPaymentLink,
+        free_shipping_threshold:
+  normalizedFreeShippingThreshold
+    ? Number(
+        normalizedFreeShippingThreshold
+      )
+    : null,
 stripe_enabled: stripeEnabled,
 
 paypal_enabled: paypalEnabled,
@@ -1168,7 +1202,33 @@ if (loading) {
             onDescriptionChange={setDescription}
             onPhoneChange={setPhone}
           />
+           <div className="rounded-2xl bg-white p-6 shadow">
+  <h2 className="text-2xl font-bold">
+    🚚 Free shipping
+  </h2>
 
+  <p className="mt-2 text-gray-600">
+    Set the minimum order value for free shipping.
+    Leave this field blank if you do not offer
+    free shipping.
+  </p>
+
+  <label className="mt-5 block font-semibold">
+    Free shipping from (€)
+  </label>
+
+  <input
+    type="number"
+    min="0.01"
+    step="0.01"
+    value={freeShippingThreshold}
+    onChange={(e) =>
+      setFreeShippingThreshold(e.target.value)
+    }
+    placeholder="For example: 100"
+    className="mt-2 w-full rounded-lg border p-3"
+  />
+</div>
           <PaymentSettings
            lang="en" 
   defaultPaymentLink={defaultPaymentLink}
