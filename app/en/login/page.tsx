@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPageEn() {
@@ -59,7 +60,14 @@ export default function LoginPageEn() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-lg border p-3"
             />
-
+             <div className="text-right">
+  <Link
+    href="/en/forgot-password"
+    className="text-sm font-medium text-blue-600 hover:underline"
+  >
+    Forgot password?
+  </Link>
+</div>
             <button
               type="submit"
               className="w-full rounded-lg bg-blue-600 p-3 text-white hover:bg-blue-700"
