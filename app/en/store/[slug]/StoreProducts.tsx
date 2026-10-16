@@ -19,11 +19,13 @@ type Product = {
 type Props = {
   products: Product[];
   slug: string;
+  discountPercent?: number | null;
 };
 
 export default function StoreProducts({
   products,
   slug,
+  discountPercent,
 }: Props) {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] =
@@ -94,7 +96,20 @@ export default function StoreProducts({
       )}
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-8">
-        {filteredProducts.map((product) => (
+        {filteredProducts.map((product) => {
+  const originalPrice = Number(product.price);
+
+  const hasDiscount =
+    discountPercent !== null &&
+    discountPercent !== undefined &&
+    discountPercent > 0 &&
+    discountPercent <= 100;
+
+  const discountedPrice = hasDiscount
+    ? originalPrice * (1 - discountPercent / 100)
+    : originalPrice;
+
+  return (
           <div
             key={product.id}
             className="relative overflow-hidden rounded-xl bg-white shadow-md sm:rounded-2xl sm:shadow-lg"
@@ -128,9 +143,27 @@ export default function StoreProducts({
     {product.name}
   </h3>
 
+ {hasDiscount ? (
+  <div className="mt-1.5 md:mt-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-sm text-gray-500 line-through sm:text-base">
+        € {originalPrice.toFixed(2)}
+      </span>
+
+      <span className="text-base font-bold text-red-600 sm:text-xl md:text-2xl">
+        € {discountedPrice.toFixed(2)}
+      </span>
+
+      <span className="rounded-md bg-red-100 px-2 py-1 text-xs font-bold text-red-700">
+        -{discountPercent}%
+      </span>
+    </div>
+  </div>
+) : (
   <p className="mt-1.5 text-base font-bold text-blue-600 sm:text-xl md:mt-3 md:text-2xl">
-    € {product.price}
+    € {originalPrice.toFixed(2)}
   </p>
+)}
 
   <Link
     href={`/en/store/${slug}/product/${product.id}`}
@@ -139,8 +172,9 @@ export default function StoreProducts({
     👁️ View
   </Link>
 </div>
-          </div>
-        ))}
+                </div>
+        );
+      })}
       </div>
     </>
   );

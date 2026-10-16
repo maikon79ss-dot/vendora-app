@@ -92,7 +92,10 @@ const [discountAmount, setDiscountAmount] =
 
 const [appliedCoupon, setAppliedCoupon] =
   useState("");
-
+const [
+  autoDiscountPercent,
+  setAutoDiscountPercent,
+] = useState<number | null>(null);
 const [
   continueShoppingUrl,
   setContinueShoppingUrl,
@@ -174,7 +177,7 @@ setFreeShippingThreshold(
   Number.isFinite(threshold) && threshold > 0
     ? threshold
     : null
-); 
+);
 setPaymentLinks({
   paypal: data?.paypal_payment_link || "",
   revolut: data?.revolut_payment_link || "",
@@ -220,7 +223,96 @@ setPaymentLinks({
 
   void loadPaymentSettings();
 }, [cartItems]);
+useEffect(() => {
+  async function loadAutomaticCoupon() {
+    if (cartItems.length === 0) {
+      setAutoDiscountPercent(null);
+      setDiscountAmount(0);
+      setAppliedCoupon("");
+      return;
+    }
 
+    const storeSlugs = Array.from(
+      new Set(cartItems.map((item) => item.storeSlug))
+    );
+
+    if (storeSlugs.length !== 1) {
+      setAutoDiscountPercent(null);
+      setDiscountAmount(0);
+      setAppliedCoupon("");
+      return;
+    }
+
+    const { data: coupons, error } = await supabase
+      .from("discount_coupons")
+      .select(
+        "code, discount_value, minimum_order, max_uses, used_count, expires_at"
+      )
+      .eq("store_slug", storeSlugs[0])
+      .eq("is_active", true)
+      .eq("discount_type", "percent")
+      .eq("minimum_order", 0)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error(
+        "Automatic discount error:",
+        error
+      );
+      return;
+    }
+
+    const activeCoupon =
+      (coupons || []).find((coupon) => {
+        const notExpired =
+          !coupon.expires_at ||
+          new Date(coupon.expires_at).getTime() >=
+            Date.now();
+
+        const usageAvailable =
+          coupon.max_uses === null ||
+          Number(coupon.used_count) <
+            Number(coupon.max_uses);
+
+        return notExpired && usageAvailable;
+      }) || null;
+
+    if (!activeCoupon) {
+      setAutoDiscountPercent(null);
+      setDiscountAmount(0);
+      setAppliedCoupon("");
+      return;
+    }
+
+    const percent = Number(
+      activeCoupon.discount_value
+    );
+
+    if (
+      !Number.isFinite(percent) ||
+      percent <= 0 ||
+      percent > 100
+    ) {
+      setAutoDiscountPercent(null);
+      setDiscountAmount(0);
+      setAppliedCoupon("");
+      return;
+    }
+
+    const calculatedDiscount =
+      cartTotal * (percent / 100);
+
+    setAutoDiscountPercent(percent);
+
+    setDiscountAmount(
+      Math.min(calculatedDiscount, cartTotal)
+    );
+
+    setAppliedCoupon(activeCoupon.code);
+  }
+
+  void loadAutomaticCoupon();
+}, [cartItems, cartTotal]);
 const finalTotal = Math.max(
   0,
   cartTotal - discountAmount
@@ -285,7 +377,7 @@ async function sendOrderEmail(
   setSendingTransferConfirmation(true);
 
   try {
-   const sellerOwnerId = bankTransferInfo.ownerId; 
+   const sellerOwnerId = bankTransferInfo.ownerId;
 
     if (!sellerOwnerId) {
       throw new Error(
@@ -1146,9 +1238,31 @@ Vendora`
   Variant: {item.variant === "Стандартен" ? "Standard" : item.variant}
 </p>
 
-                <p className="mt-2 text-xl font-semibold text-blue-600">
-                  {item.price.toFixed(2)} €
-                </p>
+                {autoDiscountPercent !== null &&
+autoDiscountPercent > 0 &&
+autoDiscountPercent <= 100 ? (
+  <div className="mt-2 flex flex-wrap items-center gap-2">
+    <span className="text-gray-500 line-through">
+      {item.price.toFixed(2)} €
+    </span>
+
+    <span className="text-xl font-semibold text-red-600">
+      {(
+        item.price *
+        (1 - autoDiscountPercent / 100)
+      ).toFixed(2)}{" "}
+      €
+    </span>
+
+    <span className="rounded-md bg-red-100 px-2 py-1 text-xs font-bold text-red-700">
+      -{autoDiscountPercent}%
+    </span>
+  </div>
+) : (
+  <p className="mt-2 text-xl font-semibold text-blue-600">
+    {item.price.toFixed(2)} €
+  </p>
+)}
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <button
@@ -1195,10 +1309,30 @@ Vendora`
                   </button>
                 </div>
 
-                <p className="mt-5 font-semibold">
-                 Subtotal: {" "}
-                  {(item.price * item.quantity).toFixed(2)} €
-                </p>
+               {autoDiscountPercent !== null &&
+autoDiscountPercent > 0 &&
+autoDiscountPercent <= 100 ? (
+  <p className="mt-5 font-semibold">
+    Subtotal:{" "}
+    <span className="mr-2 text-gray-500 line-through">
+      {(item.price * item.quantity).toFixed(2)} €
+    </span>
+
+    <span className="text-red-600">
+      {(
+        item.price *
+        item.quantity *
+        (1 - autoDiscountPercent / 100)
+      ).toFixed(2)}{" "}
+      €
+    </span>
+  </p>
+) : (
+  <p className="mt-5 font-semibold">
+    Subtotal:{" "}
+    {(item.price * item.quantity).toFixed(2)} €
+  </p>
+)}
               </div>
             </div>
           ))}
@@ -1238,38 +1372,55 @@ Vendora`
       </p>
     )}
   </div>
-)}             
-<div className="mt-8 rounded-2xl bg-white p-5 shadow sm:p-8">
-  <h2 className="text-xl font-bold sm:text-2xl">
-    🎟 Discount code
-  </h2>
+)}
+    {autoDiscountPercent !== null ? (
+  <div className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-5 sm:p-8">
+    <h2 className="text-xl font-bold text-green-700 sm:text-2xl">
+      🏷️ Promotion -{autoDiscountPercent}%
+    </h2>
 
-  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-    <input
-      value={couponCode}
-      onChange={(e) =>
-        setCouponCode(
-          e.target.value.toUpperCase()
-        )
-      }
-      placeholder="For example: WELCOME10"
-      className="min-w-0 w-full rounded-lg border p-3 sm:flex-1"
-    />
-
-    <button
-      type="button"
-      onClick={applyCoupon}
-      className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white sm:w-auto"
-    >
-      Apply
-    </button>
+    <p className="mt-2 font-semibold text-green-700">
+      The discount has been applied automatically to all products.
+    </p>
   </div>
-</div>
-  {appliedCoupon && (
+) : (
+  <div className="mt-8 rounded-2xl bg-white p-5 shadow sm:p-8">
+    <h2 className="text-xl font-bold sm:text-2xl">
+      🎟 Discount code
+    </h2>
+
+    <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+      <input
+        value={couponCode}
+        onChange={(e) =>
+          setCouponCode(
+            e.target.value.toUpperCase()
+          )
+        }
+        placeholder="For example: WELCOME10"
+        className="min-w-0 w-full rounded-lg border p-3 sm:flex-1"
+      />
+
+      <button
+        type="button"
+        onClick={applyCoupon}
+        className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white sm:w-auto"
+      >
+        Apply
+      </button>
+    </div>
+  </div>
+)}
+
+{appliedCoupon &&
+  autoDiscountPercent === null && (
     <p className="mt-4 font-semibold text-green-600">
       ✔ Active coupon: {appliedCoupon}
     </p>
   )}
+
+
+
 </div>
             <button
               type="button"
@@ -1375,7 +1526,7 @@ Vendora`
       className="mb-4 w-full rounded-lg border p-3"
     />
   </>
-)} 
+)}
 
          <label className="mb-2 block font-semibold">
   Payment method
@@ -1408,7 +1559,7 @@ Vendora`
     Bank transfer
   </option>
 )}
-</select> 
+</select>
 
             <div className="flex gap-4">
               <button

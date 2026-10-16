@@ -39,7 +39,29 @@ export default async function StorePageEn({ params }: Props) {
     .select("*")
     .eq("store_slug", decodedSlug)
     .order("id", { ascending: false });
+const { data: activeCoupons } = await supabase
+  .from("discount_coupons")
+  .select(
+    "id, discount_type, discount_value, minimum_order, max_uses, used_count, expires_at, is_active"
+  )
+  .eq("store_slug", decodedSlug)
+  .eq("is_active", true)
+  .eq("discount_type", "percent")
+  .eq("minimum_order", 0)
+  .order("created_at", { ascending: false });
 
+const activeCoupon =
+  (activeCoupons || []).find((coupon) => {
+    const notExpired =
+      !coupon.expires_at ||
+      new Date(coupon.expires_at).getTime() >= Date.now();
+
+    const usageAvailable =
+      coupon.max_uses === null ||
+      coupon.used_count < coupon.max_uses;
+
+    return notExpired && usageAvailable;
+  }) || null;
   const productIds = (products || []).map((product) =>
     String(product.id)
   );
@@ -202,6 +224,11 @@ const visibleProducts =
        <StoreProducts
   products={visibleProducts}
   slug={decodedSlug}
+  discountPercent={
+    activeCoupon
+      ? Number(activeCoupon.discount_value)
+      : null
+  }
 />
       </section>
     </main>

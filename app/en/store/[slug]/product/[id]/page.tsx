@@ -47,6 +47,8 @@ const { addToCart } = useCart();
   freeShippingThreshold,
   setFreeShippingThreshold,
 ] = useState<number | null>(null);
+const [discountPercent, setDiscountPercent] =
+  useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<ProductImage[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
 const router = useRouter();
@@ -163,6 +165,35 @@ async function sendSellerEmail(
     productData.description_en ||
     productData.description,
 });
+const { data: activeCoupons } = await supabase
+  .from("discount_coupons")
+  .select(
+    "discount_value, minimum_order, max_uses, used_count, expires_at"
+  )
+  .eq("store_slug", productData.store_slug)
+  .eq("is_active", true)
+  .eq("discount_type", "percent")
+  .eq("minimum_order", 0)
+  .order("created_at", { ascending: false });
+
+const activeCoupon =
+  (activeCoupons || []).find((coupon) => {
+    const notExpired =
+      !coupon.expires_at ||
+      new Date(coupon.expires_at).getTime() >= Date.now();
+
+    const usageAvailable =
+      coupon.max_uses === null ||
+      coupon.used_count < coupon.max_uses;
+
+    return notExpired && usageAvailable;
+  }) || null;
+
+setDiscountPercent(
+  activeCoupon
+    ? Number(activeCoupon.discount_value)
+    : null
+);
 const { data: profile, error: profileError } = await supabase
   .from("profiles")
   .select("id, email, free_shipping_threshold")
@@ -410,6 +441,16 @@ const averageRating =
         0
       ) / reviews.length
     : 0;
+    const originalPrice = Number(product.price);
+
+const hasDiscount =
+  discountPercent !== null &&
+  discountPercent > 0 &&
+  discountPercent <= 100;
+
+const discountedPrice = hasDiscount
+  ? originalPrice * (1 - discountPercent / 100)
+  : originalPrice;
   return (
     <main
   lang="en"
@@ -478,9 +519,27 @@ const averageRating =
         <div>
           <h1 className="text-4xl font-bold">{product.name}</h1>
 
-          <p className="mt-4 text-3xl font-bold text-blue-600">
-            € {product.price}
-          </p>
+          {hasDiscount ? (
+  <div className="mt-4">
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="text-xl text-gray-500 line-through">
+        € {originalPrice.toFixed(2)}
+      </span>
+
+      <span className="text-3xl font-bold text-red-600">
+        € {discountedPrice.toFixed(2)}
+      </span>
+
+      <span className="rounded-lg bg-red-100 px-3 py-1 font-bold text-red-700">
+        -{discountPercent}%
+      </span>
+    </div>
+  </div>
+) : (
+  <p className="mt-4 text-3xl font-bold text-blue-600">
+    € {originalPrice.toFixed(2)}
+  </p>
+)}
 
          {product.stock > 0 ? (
   <p className="mt-3 font-semibold text-green-600">
