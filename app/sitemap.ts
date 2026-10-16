@@ -94,33 +94,54 @@ const staticPages: MetadataRoute.Sitemap = [
   },
 ];
   const { data: profiles } = await supabase
-    .from("profiles")
-    .select("store_slug")
-    .not("store_slug", "is", null);
+  .from("profiles")
+  .select("store_slug")
+  .not("store_slug", "is", null);
+
+const { data: products } = await supabase
+  .from("products")
+  .select("store_slug")
+  .not("store_slug", "is", null);
+
+const slugsWithProducts = new Set(
+  (products || [])
+    .map((product) => product.store_slug)
+    .filter(
+      (slug): slug is string =>
+        typeof slug === "string" && slug.length > 0
+    )
+);
+
+const storeSlugs = Array.from(
+  new Set(
+    (profiles || [])
+      .map((profile) => profile.store_slug)
+      .filter(
+        (slug): slug is string =>
+          typeof slug === "string" &&
+          slug.length > 0 &&
+          slugsWithProducts.has(slug) &&
+          !slug.toLowerCase().includes("http") &&
+          !/[\/\\?#,%\s]/.test(slug)
+      )
+  )
+);
 
 const storePages: MetadataRoute.Sitemap =
-  (profiles || [])
-    .filter((profile) => profile.store_slug)
-    .map((profile) => ({
-      url: `${baseUrl}/store/${encodeURIComponent(
-        profile.store_slug
-      )}`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    }));
+  storeSlugs.map((storeSlug) => ({
+    url: `${baseUrl}/store/${encodeURIComponent(storeSlug)}`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 0.8,
+  }));
 
 const englishStorePages: MetadataRoute.Sitemap =
-  (profiles || [])
-    .filter((profile) => profile.store_slug)
-    .map((profile) => ({
-      url: `${baseUrl}/en/store/${encodeURIComponent(
-        profile.store_slug
-      )}`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    }));
+  storeSlugs.map((storeSlug) => ({
+    url: `${baseUrl}/en/store/${encodeURIComponent(storeSlug)}`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 0.8,
+  }));
 
 return [
   ...staticPages,
