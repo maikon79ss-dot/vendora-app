@@ -148,7 +148,34 @@ export default function CouponsPage() {
       setSaving(false);
       return;
     }
+     if (
+  discountType === "percent" &&
+  Number(minimumOrder || 0) === 0
+) {
+  const { error: deactivateError } = await supabase
+    .from("discount_coupons")
+    .update({ is_active: false })
+    .eq("store_slug", storeSlug)
+    .eq("discount_type", "percent")
+    .eq("minimum_order", 0)
+    .eq("is_active", true)
+    .neq("code", normalizedCode);
 
+  if (deactivateError) {
+    console.error(
+      "Error deactivating previous automatic coupon:",
+      deactivateError
+    );
+
+    setMessage(
+      "The new coupon was created, but the previous automatic coupon could not be deactivated."
+    );
+
+    await loadCoupons();
+    setSaving(false);
+    return;
+  }
+}
     setCode("");
     setDiscountType("percent");
     setDiscountValue("");
@@ -163,30 +190,61 @@ export default function CouponsPage() {
     setSaving(false);
   }
 
-  async function toggleCoupon(coupon: Coupon) {
-    setMessage("");
+ async function toggleCoupon(coupon: Coupon) {
+  setMessage("");
 
-    const { error } = await supabase
+  const newStatus = !coupon.is_active;
+
+  if (
+    newStatus &&
+    coupon.discount_type === "percent" &&
+    Number(coupon.minimum_order || 0) === 0
+  ) {
+    const { error: deactivateError } = await supabase
       .from("discount_coupons")
-      .update({
-        is_active: !coupon.is_active,
-      })
-      .eq("id", coupon.id);
+      .update({ is_active: false })
+      .eq("store_slug", storeSlug)
+      .eq("discount_type", "percent")
+      .eq("minimum_order", 0)
+      .eq("is_active", true)
+      .neq("id", coupon.id);
 
-    if (error) {
-      console.error("Error updating coupon:", error);
-      setMessage(`Error: ${error.message}`);
+    if (deactivateError) {
+      console.error(
+        "Error deactivating another automatic coupon:",
+        deactivateError
+      );
+
+      setMessage(
+        "Another automatic coupon could not be deactivated."
+      );
+
       return;
     }
-
-    setMessage(
-      coupon.is_active
-        ? `Coupon ${coupon.code} has been deactivated.`
-        : `Coupon ${coupon.code} has been activated.`
-    );
-
-    await loadCoupons();
   }
+
+  const { error } = await supabase
+    .from("discount_coupons")
+    .update({
+      is_active: newStatus,
+    })
+    .eq("id", coupon.id)
+    .eq("store_slug", storeSlug);
+
+  if (error) {
+    console.error("Error updating coupon:", error);
+    setMessage(`Error: ${error.message}`);
+    return;
+  }
+
+  setMessage(
+    newStatus
+      ? `Coupon ${coupon.code} has been activated.`
+      : `Coupon ${coupon.code} has been deactivated.`
+  );
+
+  await loadCoupons();
+}
 
   async function deleteCoupon(coupon: Coupon) {
     const confirmed = window.confirm(
