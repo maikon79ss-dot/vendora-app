@@ -159,11 +159,25 @@ setSubscriptionPlan(profile.subscription_plan || "free");
       setIsSaving(false);
       return;
     }
+if (discountType === "percent" && minimum === 0) {
+  const { error: deactivateError } = await supabase
+    .from("discount_coupons")
+    .update({ is_active: false })
+    .eq("owner_id", userId)
+    .eq("store_slug", storeSlug)
+    .eq("discount_type", "percent")
+    .eq("minimum_order", 0)
+    .eq("is_active", true)
+    .neq("id", data.id);
 
-    setCoupons((currentCoupons) => [
-      data,
-      ...currentCoupons,
-    ]);
+  if (deactivateError) {
+    console.error(
+      "Грешка при деактивиране на стария автоматичен купон:",
+      deactivateError
+    );
+  }
+}
+    await loadCoupons();
 
     setCode("");
     setDiscountType("percent");
@@ -175,32 +189,47 @@ setSubscriptionPlan(profile.subscription_plan || "free");
     setIsSaving(false);
   }
 
-  async function toggleCoupon(coupon: Coupon) {
-    const newStatus = !coupon.is_active;
+ async function toggleCoupon(coupon: Coupon) {
+  const newStatus = !coupon.is_active;
 
-    const { error } = await supabase
+  if (
+    newStatus &&
+    coupon.discount_type === "percent" &&
+    Number(coupon.minimum_order) === 0
+  ) {
+    const { error: deactivateError } = await supabase
       .from("discount_coupons")
-      .update({ is_active: newStatus })
-      .eq("id", coupon.id)
-      .eq("owner_id", userId);
+      .update({ is_active: false })
+      .eq("owner_id", userId)
+      .eq("store_slug", storeSlug)
+      .eq("discount_type", "percent")
+      .eq("minimum_order", 0)
+      .eq("is_active", true)
+      .neq("id", coupon.id);
 
-    if (error) {
-      console.error(error);
-      alert("Грешка при промяна на статуса.");
+    if (deactivateError) {
+      console.error(deactivateError);
+      alert(
+        "Грешка при деактивиране на другия автоматичен купон."
+      );
       return;
     }
-
-    setCoupons((currentCoupons) =>
-      currentCoupons.map((currentCoupon) =>
-        currentCoupon.id === coupon.id
-          ? {
-              ...currentCoupon,
-              is_active: newStatus,
-            }
-          : currentCoupon
-      )
-    );
   }
+
+  const { error } = await supabase
+    .from("discount_coupons")
+    .update({ is_active: newStatus })
+    .eq("id", coupon.id)
+    .eq("owner_id", userId);
+
+  if (error) {
+    console.error(error);
+    alert("Грешка при промяна на статуса.");
+    return;
+  }
+
+  await loadCoupons();
+}
 
   async function deleteCoupon(id: number) {
     const confirmed = window.confirm(
