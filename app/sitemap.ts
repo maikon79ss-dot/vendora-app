@@ -5,7 +5,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     "https://www.vendora.trade";
-
+const testStoreSlugs = new Set([
+  "ivan-ivanov",
+  "nikoleta",
+]);
 const staticPages: MetadataRoute.Sitemap = [
   {
     url: baseUrl,
@@ -122,7 +125,8 @@ const storeSlugs = Array.from(
           slug.length > 0 &&
           slugsWithProducts.has(slug) &&
           !slug.toLowerCase().includes("http") &&
-          !/[\/\\?#,%\s]/.test(slug)
+          !/[\/\\?#,%\s]/.test(slug)&&
+          !testStoreSlugs.has(slug)
       )
   )
 );
